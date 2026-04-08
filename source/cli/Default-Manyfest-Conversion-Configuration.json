@@ -1,0 +1,10 @@
+{
+	"SourceRootAddress": "ReportData.FormData",
+	"Paths":
+	{
+		"MappingsDirectory": "./mappings",
+		"SourceJSONDirectory": "./source",
+		"TemplatesDirectory": "./templates",
+		"OutputDirectory": "./output"
+	}
+}
