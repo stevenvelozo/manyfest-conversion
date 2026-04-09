@@ -395,6 +395,184 @@ class MappingManyfestBuilder extends libFableServiceProviderBase
 	}
 
 	/**
+	 * Escape a single CSV cell value.  Returns the value unchanged unless
+	 * it contains a comma, double quote, or newline, in which case it is
+	 * wrapped in double quotes and any inner double quotes are doubled.
+	 *
+	 * @param {*} pValue
+	 * @returns {string}
+	 */
+	escapeCSVCell(pValue)
+	{
+		if (pValue === null || typeof(pValue) === 'undefined')
+		{
+			return '';
+		}
+		const tmpString = String(pValue);
+		if (/[",\n\r]/.test(tmpString))
+		{
+			return `"${tmpString.replace(/"/g, '""')}"`;
+		}
+		return tmpString;
+	}
+
+	/**
+	 * Build a free-form "Notes" cell from the extra metadata pdftk surfaces
+	 * on a PDF field (tooltip, justification, checkbox state options).
+	 */
+	buildNotesForExtractedField(pField)
+	{
+		if (!pField)
+		{
+			return '';
+		}
+		const tmpParts = [];
+		if (pField.FieldNameAlt)
+		{
+			tmpParts.push(`Tooltip: ${pField.FieldNameAlt}`);
+		}
+		if (pField.FieldJustification && pField.FieldJustification !== 'Left')
+		{
+			tmpParts.push(`Justification: ${pField.FieldJustification}`);
+		}
+		if (pField.FieldFlags && pField.FieldFlags !== '0')
+		{
+			tmpParts.push(`Flags: ${pField.FieldFlags}`);
+		}
+		if (Array.isArray(pField.FieldStateOptions) && pField.FieldStateOptions.length > 0)
+		{
+			tmpParts.push(`States: ${pField.FieldStateOptions.join('|')}`);
+		}
+		return tmpParts.join('; ');
+	}
+
+	/**
+	 * Build a ready-to-fill mapping CSV string from an array of extracted
+	 * field descriptor objects (as returned by PDFFormFiller.dumpFormFields).
+	 *
+	 * The CSV uses the same column layout that buildFromCSVFile consumes, so
+	 * the output can be hand-edited (filling in the Form Input Address and
+	 * Form columns) and then fed straight back through `mfconv build-mappings`.
+	 *
+	 * @param {Array<object>} pFields - Extracted field descriptors
+	 * @param {string} pTargetFileName - The PDF filename to put in the "PDF File" column
+	 * @param {object} [pOptions]
+	 * @param {string} [pOptions.formName] - Value to put in every row's "Form" column
+	 * @param {string} [pOptions.documentDataLongFiller] - Value to put in every row's "Document Data Long Filler" column
+	 * @returns {string} CSV document (with header row), LF-terminated.
+	 */
+	generateMappingCSVFromFields(pFields, pTargetFileName, pOptions)
+	{
+		pOptions = pOptions || {};
+		const tmpFormName = pOptions.formName || '';
+		const tmpLongFiller = pOptions.documentDataLongFiller || '';
+		const tmpTargetFile = pTargetFileName || '';
+
+		const tmpHeader = [
+			'Sort',
+			'PDF File',
+			'Field Type',
+			'Field Name',
+			'Form',
+			'Document Data Long Filler',
+			'Form Input Address',
+			'Form Input Address Long',
+			'Notes'
+		].join(',');
+
+		const tmpLines = [tmpHeader];
+		const tmpFields = Array.isArray(pFields) ? pFields : [];
+
+		for (let i = 0; i < tmpFields.length; i++)
+		{
+			const tmpField = tmpFields[i];
+			if (!tmpField || !tmpField.FieldName)
+			{
+				continue;
+			}
+			const tmpRow = [
+				String(i + 1),
+				tmpTargetFile,
+				tmpField.FieldType || 'Text',
+				tmpField.FieldName,
+				tmpFormName,
+				tmpLongFiller,
+				'',
+				'',
+				this.buildNotesForExtractedField(tmpField)
+			].map((c) => this.escapeCSVCell(c));
+			tmpLines.push(tmpRow.join(','));
+		}
+
+		return tmpLines.join('\n') + '\n';
+	}
+
+	/**
+	 * Default output filename for an extracted mapping CSV.
+	 * Turns "/path/to/Washington-Drivers-Form.pdf" into
+	 *       "/path/to/Washington-Drivers-Form-ManyfestMapping.csv".
+	 */
+	defaultMappingCSVPathForPDF(pPDFPath)
+	{
+		const tmpDir = libPath.dirname(pPDFPath);
+		const tmpExt = libPath.extname(pPDFPath);
+		const tmpBase = libPath.basename(pPDFPath, tmpExt);
+		return libPath.join(tmpDir, `${tmpBase}-ManyfestMapping.csv`);
+	}
+
+	/**
+	 * Extract fillable form fields from a PDF (via PDFFormFiller.dumpFormFields)
+	 * and write a ready-to-fill mapping CSV to disk.
+	 *
+	 * @param {string} pPDFPath - Path to the input PDF
+	 * @param {string} [pOutputCSVPath] - Output CSV path.  If omitted, defaults to
+	 *                                    <pdf-basename>-ManyfestMapping.csv next
+	 *                                    to the PDF.
+	 * @param {object} [pOptions] - Passed through to generateMappingCSVFromFields
+	 * @returns {{ csv: string, fields: Array<object>, targetFileName: string, outputPath: string }}
+	 */
+	generateMappingCSVFromPDF(pPDFPath, pOutputCSVPath, pOptions)
+	{
+		if (!pPDFPath || !libFS.existsSync(pPDFPath))
+		{
+			throw new Error(`PDF file [${pPDFPath}] does not exist.`);
+		}
+
+		// Resolve (or instantiate) the PDFFormFiller service to reuse its pdftk
+		// binary discovery and output parsing.
+		let tmpFiller = null;
+		if (this.fable && this.fable.PDFFormFiller)
+		{
+			tmpFiller = this.fable.PDFFormFiller;
+		}
+		else if (this.fable && typeof(this.fable.addAndInstantiateServiceTypeIfNotExists) === 'function')
+		{
+			const libPDFFormFiller = require('./Service-PDFFormFiller.js');
+			this.fable.addAndInstantiateServiceTypeIfNotExists('PDFFormFiller', libPDFFormFiller);
+			tmpFiller = this.fable.PDFFormFiller;
+		}
+		if (!tmpFiller)
+		{
+			throw new Error('PDFFormFiller service is not available; cannot extract fields from PDF.');
+		}
+
+		const tmpFields = tmpFiller.dumpFormFields(pPDFPath);
+		const tmpTargetFileName = libPath.basename(pPDFPath);
+		const tmpCSV = this.generateMappingCSVFromFields(tmpFields, tmpTargetFileName, pOptions);
+
+		const tmpOutputPath = pOutputCSVPath || this.defaultMappingCSVPathForPDF(pPDFPath);
+		libFS.writeFileSync(tmpOutputPath, tmpCSV);
+
+		return (
+			{
+				csv: tmpCSV,
+				fields: tmpFields,
+				targetFileName: tmpTargetFileName,
+				outputPath: tmpOutputPath
+			});
+	}
+
+	/**
 	 * Materialize a map of config objects into live Manyfest instances.
 	 */
 	instantiateManyfests(pMappingConfigs)

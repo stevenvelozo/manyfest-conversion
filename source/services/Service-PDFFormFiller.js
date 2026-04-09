@@ -56,6 +56,151 @@ class PDFFormFiller extends libFableServiceProviderBase
 	}
 
 	/**
+	 * Shell out to `pdftk <pdf> dump_data_fields` and parse the output into
+	 * an array of field descriptor objects.
+	 *
+	 * Each returned object has the shape:
+	 *   {
+	 *     FieldType: 'Text' | 'Button' | 'Choice' | ...,
+	 *     FieldName: string,                 // the AcroForm field name
+	 *     FieldNameAlt: string | null,       // the "tooltip" alt name (optional)
+	 *     FieldFlags: string | null,         // numeric flags as emitted by pdftk
+	 *     FieldJustification: string | null, // 'Left' | 'Center' | 'Right'
+	 *     FieldValue: string | null,         // current value if any
+	 *     FieldStateOptions: string[]        // checkbox / radio states (if any)
+	 *   }
+	 *
+	 * Throws if the PDF does not exist, pdftk is missing, or pdftk exits
+	 * with a non-zero status.
+	 *
+	 * @param {string} pPDFPath
+	 * @returns {Array<object>}
+	 */
+	dumpFormFields(pPDFPath)
+	{
+		if (!pPDFPath || !libFS.existsSync(pPDFPath))
+		{
+			throw new Error(`PDF does not exist: ${pPDFPath}`);
+		}
+
+		const tmpBinary = this.resolvePDFTKBinary();
+		if (!tmpBinary)
+		{
+			throw new Error('pdftk binary not found on PATH.  Install via "brew install pdftk-java" (macOS) or "apt install pdftk" (Debian/Ubuntu).');
+		}
+
+		const tmpResult = libChildProcess.spawnSync(tmpBinary, [pPDFPath, 'dump_data_fields'], { encoding: 'utf8' });
+		if (tmpResult.error)
+		{
+			throw new Error(`Failed to spawn pdftk: ${tmpResult.error.message}`);
+		}
+		if (tmpResult.status !== 0)
+		{
+			const tmpStderr = (tmpResult.stderr || '').trim();
+			throw new Error(`pdftk dump_data_fields exited with status ${tmpResult.status}: ${tmpStderr}`);
+		}
+
+		return this.parseDumpDataFields(tmpResult.stdout || '');
+	}
+
+	/**
+	 * Parse the raw stdout of `pdftk <pdf> dump_data_fields` into an array of
+	 * field descriptor objects.  Pure function; safe to call in tests with a
+	 * hand-crafted input string and no pdftk binary on PATH.
+	 *
+	 * @param {string} pRawOutput
+	 * @returns {Array<object>}
+	 */
+	parseDumpDataFields(pRawOutput)
+	{
+		if (!pRawOutput || typeof(pRawOutput) !== 'string')
+		{
+			return [];
+		}
+
+		const tmpLines = pRawOutput.split(/\r?\n/);
+		const tmpFields = [];
+		let tmpCurrent = null;
+
+		const pushCurrent = () =>
+		{
+			if (tmpCurrent && tmpCurrent.FieldName)
+			{
+				tmpFields.push(tmpCurrent);
+			}
+		};
+
+		for (let i = 0; i < tmpLines.length; i++)
+		{
+			const tmpLine = tmpLines[i];
+
+			if (tmpLine === '---')
+			{
+				pushCurrent();
+				tmpCurrent = (
+					{
+						FieldType: null,
+						FieldName: null,
+						FieldNameAlt: null,
+						FieldFlags: null,
+						FieldJustification: null,
+						FieldValue: null,
+						FieldStateOptions: []
+					});
+				continue;
+			}
+
+			if (!tmpCurrent)
+			{
+				// Skip any header lines that appear before the first `---`.
+				continue;
+			}
+
+			const tmpColonIndex = tmpLine.indexOf(':');
+			if (tmpColonIndex < 0)
+			{
+				continue;
+			}
+
+			const tmpKey = tmpLine.substring(0, tmpColonIndex);
+			const tmpValue = tmpLine.substring(tmpColonIndex + 1).replace(/^\s+/, '');
+
+			switch (tmpKey)
+			{
+				case 'FieldType':
+					tmpCurrent.FieldType = tmpValue;
+					break;
+				case 'FieldName':
+					tmpCurrent.FieldName = tmpValue;
+					break;
+				case 'FieldNameAlt':
+					tmpCurrent.FieldNameAlt = tmpValue;
+					break;
+				case 'FieldFlags':
+					tmpCurrent.FieldFlags = tmpValue;
+					break;
+				case 'FieldJustification':
+					tmpCurrent.FieldJustification = tmpValue;
+					break;
+				case 'FieldValue':
+					tmpCurrent.FieldValue = tmpValue;
+					break;
+				case 'FieldStateOption':
+					tmpCurrent.FieldStateOptions.push(tmpValue);
+					break;
+				default:
+					// Unknown key; ignore so new pdftk versions don't blow up.
+					break;
+			}
+		}
+
+		// Flush the trailing block.
+		pushCurrent();
+
+		return tmpFields;
+	}
+
+	/**
 	 * Escape a string for safe inclusion inside an XFDF <value> element.
 	 */
 	escapeXML(pValue)

@@ -1,0 +1,28 @@
+{
+    "RowsParsed": 22,
+    "RowsSkipped": 2,
+    "RowsAccepted": 20,
+    "FormCount": 1,
+    "Forms": {
+        "fw9.pdf": {
+            "DescriptorCount": 20,
+            "UnmappedCount": 2,
+            "TargetFileType": "PDF"
+        }
+    },
+    "SkipReasons": [
+        {
+            "Row": 21,
+            "TargetFile": "fw9.pdf",
+            "FieldName": "topmostSubform[0].Page1[0].f1_10[0]",
+            "Reason": "Missing Form Input Address"
+        },
+        {
+            "Row": 22,
+            "TargetFile": "fw9.pdf",
+            "FieldName": "topmostSubform[0].Page1[0].Date[0]",
+            "Reason": "Missing Form Input Address"
+        }
+    ],
+    "Errors": []
+}

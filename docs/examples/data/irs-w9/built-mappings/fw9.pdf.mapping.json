@@ -1,0 +1,243 @@
+{
+    "Scope": "IRS-W9::fw9.pdf",
+    "SourceRootAddress": "ReportData.W9Data",
+    "TargetFile": "fw9.pdf",
+    "TargetFileType": "PDF",
+    "SourceDocumentType": "IRS-W9",
+    "SourceRootFullPath": "W9Data.",
+    "Descriptors": {
+        "LegalName": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].f1_01[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__f1_01_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].f1_01[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 1,
+            "SourceAddressRaw": "LegalName",
+            "SourceAddressLong": "W9Data.LegalName",
+            "Notes": "Line 1 - Name (as shown on income tax return)"
+        },
+        "BusinessName": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].f1_02[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__f1_02_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].f1_02[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 2,
+            "SourceAddressRaw": "BusinessName",
+            "SourceAddressLong": "W9Data.BusinessName",
+            "Notes": "Line 2 - Business name / disregarded entity name (if different from above)"
+        },
+        "Classification.Individual": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].FederalClassification[0].c1_1[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__FederalClassification_0__c1_1_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].FederalClassification[0].c1_1[0]",
+            "TargetFieldType": "Button",
+            "SourceSortOrder": 10,
+            "SourceAddressRaw": "Classification.Individual",
+            "SourceAddressLong": "W9Data.Classification.Individual",
+            "Notes": "Line 3a checkbox - Individual/sole proprietor"
+        },
+        "Classification.CCorp": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].FederalClassification[0].c1_1[1]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__FederalClassification_0__c1_1_1_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].FederalClassification[0].c1_1[1]",
+            "TargetFieldType": "Button",
+            "SourceSortOrder": 11,
+            "SourceAddressRaw": "Classification.CCorp",
+            "SourceAddressLong": "W9Data.Classification.CCorp",
+            "Notes": "Line 3a checkbox - C corporation"
+        },
+        "Classification.SCorp": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].FederalClassification[0].c1_1[2]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__FederalClassification_0__c1_1_2_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].FederalClassification[0].c1_1[2]",
+            "TargetFieldType": "Button",
+            "SourceSortOrder": 12,
+            "SourceAddressRaw": "Classification.SCorp",
+            "SourceAddressLong": "W9Data.Classification.SCorp",
+            "Notes": "Line 3a checkbox - S corporation"
+        },
+        "Classification.Partnership": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].FederalClassification[0].c1_1[3]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__FederalClassification_0__c1_1_3_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].FederalClassification[0].c1_1[3]",
+            "TargetFieldType": "Button",
+            "SourceSortOrder": 13,
+            "SourceAddressRaw": "Classification.Partnership",
+            "SourceAddressLong": "W9Data.Classification.Partnership",
+            "Notes": "Line 3a checkbox - Partnership"
+        },
+        "Classification.Trust": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].FederalClassification[0].c1_1[4]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__FederalClassification_0__c1_1_4_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].FederalClassification[0].c1_1[4]",
+            "TargetFieldType": "Button",
+            "SourceSortOrder": 14,
+            "SourceAddressRaw": "Classification.Trust",
+            "SourceAddressLong": "W9Data.Classification.Trust",
+            "Notes": "Line 3a checkbox - Trust/estate"
+        },
+        "Classification.LLC": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].FederalClassification[0].c1_1[5]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__FederalClassification_0__c1_1_5_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].FederalClassification[0].c1_1[5]",
+            "TargetFieldType": "Button",
+            "SourceSortOrder": 15,
+            "SourceAddressRaw": "Classification.LLC",
+            "SourceAddressLong": "W9Data.Classification.LLC",
+            "Notes": "Line 3a checkbox - Limited liability company"
+        },
+        "Classification.LLCTaxClass": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].FederalClassification[0].f1_03[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__FederalClassification_0__f1_03_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].FederalClassification[0].f1_03[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 16,
+            "SourceAddressRaw": "Classification.LLCTaxClass",
+            "SourceAddressLong": "W9Data.Classification.LLCTaxClass",
+            "Notes": "Line 3a - LLC tax classification (C / S / P)"
+        },
+        "ExemptPayeeCode": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].f1_04[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__f1_04_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].f1_04[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 20,
+            "SourceAddressRaw": "ExemptPayeeCode",
+            "SourceAddressLong": "W9Data.ExemptPayeeCode",
+            "Notes": "Line 4 - Exempt payee code (if any)"
+        },
+        "FATCAReportingCode": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].f1_05[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__f1_05_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].f1_05[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 21,
+            "SourceAddressRaw": "FATCAReportingCode",
+            "SourceAddressLong": "W9Data.FATCAReportingCode",
+            "Notes": "Line 4 - FATCA reporting code (if any)"
+        },
+        "Address.Street": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].f1_06[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__f1_06_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].f1_06[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 30,
+            "SourceAddressRaw": "Address.Street",
+            "SourceAddressLong": "W9Data.Address.Street",
+            "Notes": "Line 5 - Address (number street and apt. or suite no.)"
+        },
+        "Address.CityStateZip": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].f1_07[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__f1_07_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].f1_07[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 31,
+            "SourceAddressRaw": "Address.CityStateZip",
+            "SourceAddressLong": "W9Data.Address.CityStateZip",
+            "Notes": "Line 6 - City state and ZIP code"
+        },
+        "RequesterNameAndAddress": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].f1_08[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__f1_08_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].f1_08[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 40,
+            "SourceAddressRaw": "RequesterNameAndAddress",
+            "SourceAddressLong": "W9Data.RequesterNameAndAddress",
+            "Notes": "Requester's name and address (optional)"
+        },
+        "AccountNumbers": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].f1_09[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__f1_09_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].f1_09[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 41,
+            "SourceAddressRaw": "AccountNumbers",
+            "SourceAddressLong": "W9Data.AccountNumbers",
+            "Notes": "List account number(s) here (optional)"
+        },
+        "TaxIdentification.SSN1": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].SSN[0].f1_11[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__SSN_0__f1_11_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].SSN[0].f1_11[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 50,
+            "SourceAddressRaw": "TaxIdentification.SSN1",
+            "SourceAddressLong": "W9Data.TaxIdentification.SSN1",
+            "Notes": "Part I - Social Security Number digits 1-3"
+        },
+        "TaxIdentification.SSN2": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].SSN[0].f1_12[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__SSN_0__f1_12_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].SSN[0].f1_12[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 51,
+            "SourceAddressRaw": "TaxIdentification.SSN2",
+            "SourceAddressLong": "W9Data.TaxIdentification.SSN2",
+            "Notes": "Part I - Social Security Number digits 4-5"
+        },
+        "TaxIdentification.SSN3": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].SSN[0].f1_13[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__SSN_0__f1_13_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].SSN[0].f1_13[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 52,
+            "SourceAddressRaw": "TaxIdentification.SSN3",
+            "SourceAddressLong": "W9Data.TaxIdentification.SSN3",
+            "Notes": "Part I - Social Security Number digits 6-9"
+        },
+        "TaxIdentification.EIN1": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].EIN[0].f1_14[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__EIN_0__f1_14_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].EIN[0].f1_14[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 53,
+            "SourceAddressRaw": "TaxIdentification.EIN1",
+            "SourceAddressLong": "W9Data.TaxIdentification.EIN1",
+            "Notes": "Part I - Employer Identification Number digits 1-2"
+        },
+        "TaxIdentification.EIN2": {
+            "Name": "fw9.pdf/topmostSubform[0].Page1[0].EIN[0].f1_15[0]",
+            "Hash": "fw9__topmostSubform_0__Page1_0__EIN_0__f1_15_0_",
+            "DataType": "String",
+            "TargetFieldName": "topmostSubform[0].Page1[0].EIN[0].f1_15[0]",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 54,
+            "SourceAddressRaw": "TaxIdentification.EIN2",
+            "SourceAddressLong": "W9Data.TaxIdentification.EIN2",
+            "Notes": "Part I - Employer Identification Number digits 3-9"
+        }
+    },
+    "HashTranslations": {},
+    "UnmappedTargetFields": [
+        {
+            "FieldName": "topmostSubform[0].Page1[0].f1_10[0]",
+            "FieldType": "Text",
+            "Notes": null
+        },
+        {
+            "FieldName": "topmostSubform[0].Page1[0].Date[0]",
+            "FieldType": "Text",
+            "Notes": null
+        }
+    ]
+}

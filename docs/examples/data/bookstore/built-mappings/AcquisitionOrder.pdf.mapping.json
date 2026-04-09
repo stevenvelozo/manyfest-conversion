@@ -1,0 +1,293 @@
+{
+    "Scope": "Bookstore-Acquisition::AcquisitionOrder.pdf",
+    "SourceRootAddress": "ReportData.OrderData",
+    "TargetFile": "AcquisitionOrder.pdf",
+    "TargetFileType": "PDF",
+    "SourceDocumentType": "Bookstore-Acquisition",
+    "SourceRootFullPath": "OrderData.",
+    "Descriptors": {
+        "Header.PONumber": {
+            "Name": "AcquisitionOrder.pdf/po_number",
+            "Hash": "AcquisitionOrder__po_number",
+            "DataType": "String",
+            "TargetFieldName": "po_number",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 1,
+            "SourceAddressRaw": "Header.PONumber",
+            "SourceAddressLong": "OrderData.Header.PONumber"
+        },
+        "Header.OrderDate": {
+            "Name": "AcquisitionOrder.pdf/order_date",
+            "Hash": "AcquisitionOrder__order_date",
+            "DataType": "String",
+            "TargetFieldName": "order_date",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 2,
+            "SourceAddressRaw": "Header.OrderDate",
+            "SourceAddressLong": "OrderData.Header.OrderDate"
+        },
+        "Header.VendorName": {
+            "Name": "AcquisitionOrder.pdf/vendor_name",
+            "Hash": "AcquisitionOrder__vendor_name",
+            "DataType": "String",
+            "TargetFieldName": "vendor_name",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 3,
+            "SourceAddressRaw": "Header.VendorName",
+            "SourceAddressLong": "OrderData.Header.VendorName"
+        },
+        "Header.VendorAccount": {
+            "Name": "AcquisitionOrder.pdf/vendor_account",
+            "Hash": "AcquisitionOrder__vendor_account",
+            "DataType": "String",
+            "TargetFieldName": "vendor_account",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 4,
+            "SourceAddressRaw": "Header.VendorAccount",
+            "SourceAddressLong": "OrderData.Header.VendorAccount"
+        },
+        "Header.ShipTo": {
+            "Name": "AcquisitionOrder.pdf/ship_to",
+            "Hash": "AcquisitionOrder__ship_to",
+            "DataType": "String",
+            "TargetFieldName": "ship_to",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 5,
+            "SourceAddressRaw": "Header.ShipTo",
+            "SourceAddressLong": "OrderData.Header.ShipTo"
+        },
+        "Header.BuyerName": {
+            "Name": "AcquisitionOrder.pdf/buyer_name",
+            "Hash": "AcquisitionOrder__buyer_name",
+            "DataType": "String",
+            "TargetFieldName": "buyer_name",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 6,
+            "SourceAddressRaw": "Header.BuyerName",
+            "SourceAddressLong": "OrderData.Header.BuyerName"
+        },
+        "Header.BuyerEmail": {
+            "Name": "AcquisitionOrder.pdf/buyer_email",
+            "Hash": "AcquisitionOrder__buyer_email",
+            "DataType": "String",
+            "TargetFieldName": "buyer_email",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 7,
+            "SourceAddressRaw": "Header.BuyerEmail",
+            "SourceAddressLong": "OrderData.Header.BuyerEmail"
+        },
+        "LineItems[0].ISBN": {
+            "Name": "AcquisitionOrder.pdf/line1_isbn",
+            "Hash": "AcquisitionOrder__line1_isbn",
+            "DataType": "String",
+            "TargetFieldName": "line1_isbn",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 10,
+            "SourceAddressRaw": "LineItems[0].ISBN",
+            "SourceAddressLong": "OrderData.LineItems[0].ISBN"
+        },
+        "LineItems[0].Title": {
+            "Name": "AcquisitionOrder.pdf/line1_title",
+            "Hash": "AcquisitionOrder__line1_title",
+            "DataType": "String",
+            "TargetFieldName": "line1_title",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 11,
+            "SourceAddressRaw": "LineItems[0].Title",
+            "SourceAddressLong": "OrderData.LineItems[0].Title"
+        },
+        "LineItems[0].Author": {
+            "Name": "AcquisitionOrder.pdf/line1_author",
+            "Hash": "AcquisitionOrder__line1_author",
+            "DataType": "String",
+            "TargetFieldName": "line1_author",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 12,
+            "SourceAddressRaw": "LineItems[0].Author",
+            "SourceAddressLong": "OrderData.LineItems[0].Author"
+        },
+        "LineItems[0].QtyOrdered": {
+            "Name": "AcquisitionOrder.pdf/line1_qty",
+            "Hash": "AcquisitionOrder__line1_qty",
+            "DataType": "String",
+            "TargetFieldName": "line1_qty",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 13,
+            "SourceAddressRaw": "LineItems[0].QtyOrdered",
+            "SourceAddressLong": "OrderData.LineItems[0].QtyOrdered"
+        },
+        "LineItems[0].UnitPrice": {
+            "Name": "AcquisitionOrder.pdf/line1_unit_price",
+            "Hash": "AcquisitionOrder__line1_unit_price",
+            "DataType": "String",
+            "TargetFieldName": "line1_unit_price",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 14,
+            "SourceAddressRaw": "LineItems[0].UnitPrice",
+            "SourceAddressLong": "OrderData.LineItems[0].UnitPrice"
+        },
+        "LineItems[1].ISBN": {
+            "Name": "AcquisitionOrder.pdf/line2_isbn",
+            "Hash": "AcquisitionOrder__line2_isbn",
+            "DataType": "String",
+            "TargetFieldName": "line2_isbn",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 20,
+            "SourceAddressRaw": "LineItems[1].ISBN",
+            "SourceAddressLong": "OrderData.LineItems[1].ISBN"
+        },
+        "LineItems[1].Title": {
+            "Name": "AcquisitionOrder.pdf/line2_title",
+            "Hash": "AcquisitionOrder__line2_title",
+            "DataType": "String",
+            "TargetFieldName": "line2_title",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 21,
+            "SourceAddressRaw": "LineItems[1].Title",
+            "SourceAddressLong": "OrderData.LineItems[1].Title"
+        },
+        "LineItems[1].Author": {
+            "Name": "AcquisitionOrder.pdf/line2_author",
+            "Hash": "AcquisitionOrder__line2_author",
+            "DataType": "String",
+            "TargetFieldName": "line2_author",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 22,
+            "SourceAddressRaw": "LineItems[1].Author",
+            "SourceAddressLong": "OrderData.LineItems[1].Author"
+        },
+        "LineItems[1].QtyOrdered": {
+            "Name": "AcquisitionOrder.pdf/line2_qty",
+            "Hash": "AcquisitionOrder__line2_qty",
+            "DataType": "String",
+            "TargetFieldName": "line2_qty",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 23,
+            "SourceAddressRaw": "LineItems[1].QtyOrdered",
+            "SourceAddressLong": "OrderData.LineItems[1].QtyOrdered"
+        },
+        "LineItems[1].UnitPrice": {
+            "Name": "AcquisitionOrder.pdf/line2_unit_price",
+            "Hash": "AcquisitionOrder__line2_unit_price",
+            "DataType": "String",
+            "TargetFieldName": "line2_unit_price",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 24,
+            "SourceAddressRaw": "LineItems[1].UnitPrice",
+            "SourceAddressLong": "OrderData.LineItems[1].UnitPrice"
+        },
+        "LineItems[2].ISBN": {
+            "Name": "AcquisitionOrder.pdf/line3_isbn",
+            "Hash": "AcquisitionOrder__line3_isbn",
+            "DataType": "String",
+            "TargetFieldName": "line3_isbn",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 30,
+            "SourceAddressRaw": "LineItems[2].ISBN",
+            "SourceAddressLong": "OrderData.LineItems[2].ISBN"
+        },
+        "LineItems[2].Title": {
+            "Name": "AcquisitionOrder.pdf/line3_title",
+            "Hash": "AcquisitionOrder__line3_title",
+            "DataType": "String",
+            "TargetFieldName": "line3_title",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 31,
+            "SourceAddressRaw": "LineItems[2].Title",
+            "SourceAddressLong": "OrderData.LineItems[2].Title"
+        },
+        "LineItems[2].Author": {
+            "Name": "AcquisitionOrder.pdf/line3_author",
+            "Hash": "AcquisitionOrder__line3_author",
+            "DataType": "String",
+            "TargetFieldName": "line3_author",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 32,
+            "SourceAddressRaw": "LineItems[2].Author",
+            "SourceAddressLong": "OrderData.LineItems[2].Author"
+        },
+        "LineItems[2].QtyOrdered": {
+            "Name": "AcquisitionOrder.pdf/line3_qty",
+            "Hash": "AcquisitionOrder__line3_qty",
+            "DataType": "String",
+            "TargetFieldName": "line3_qty",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 33,
+            "SourceAddressRaw": "LineItems[2].QtyOrdered",
+            "SourceAddressLong": "OrderData.LineItems[2].QtyOrdered"
+        },
+        "LineItems[2].UnitPrice": {
+            "Name": "AcquisitionOrder.pdf/line3_unit_price",
+            "Hash": "AcquisitionOrder__line3_unit_price",
+            "DataType": "String",
+            "TargetFieldName": "line3_unit_price",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 34,
+            "SourceAddressRaw": "LineItems[2].UnitPrice",
+            "SourceAddressLong": "OrderData.LineItems[2].UnitPrice"
+        },
+        "Totals.QtyTotal": {
+            "Name": "AcquisitionOrder.pdf/total_qty",
+            "Hash": "AcquisitionOrder__total_qty",
+            "DataType": "String",
+            "TargetFieldName": "total_qty",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 90,
+            "SourceAddressRaw": "Totals.QtyTotal",
+            "SourceAddressLong": "OrderData.Totals.QtyTotal"
+        },
+        "Totals.Subtotal": {
+            "Name": "AcquisitionOrder.pdf/subtotal",
+            "Hash": "AcquisitionOrder__subtotal",
+            "DataType": "String",
+            "TargetFieldName": "subtotal",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 91,
+            "SourceAddressRaw": "Totals.Subtotal",
+            "SourceAddressLong": "OrderData.Totals.Subtotal"
+        },
+        "Totals.Tax": {
+            "Name": "AcquisitionOrder.pdf/tax",
+            "Hash": "AcquisitionOrder__tax",
+            "DataType": "String",
+            "TargetFieldName": "tax",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 92,
+            "SourceAddressRaw": "Totals.Tax",
+            "SourceAddressLong": "OrderData.Totals.Tax"
+        },
+        "Totals.Grand": {
+            "Name": "AcquisitionOrder.pdf/grand_total",
+            "Hash": "AcquisitionOrder__grand_total",
+            "DataType": "String",
+            "TargetFieldName": "grand_total",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 93,
+            "SourceAddressRaw": "Totals.Grand",
+            "SourceAddressLong": "OrderData.Totals.Grand"
+        },
+        "Header.Notes": {
+            "Name": "AcquisitionOrder.pdf/notes",
+            "Hash": "AcquisitionOrder__notes",
+            "DataType": "String",
+            "TargetFieldName": "notes",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": 95,
+            "SourceAddressRaw": "Header.Notes",
+            "SourceAddressLong": "OrderData.Header.Notes"
+        }
+    },
+    "HashTranslations": {},
+    "UnmappedTargetFields": [
+        {
+            "FieldName": "receiver_signature",
+            "FieldType": "Text",
+            "Notes": "To be signed by hand on delivery"
+        },
+        {
+            "FieldName": "receiver_date",
+            "FieldType": "Text",
+            "Notes": "To be signed by hand on delivery"
+        }
+    ]
+}

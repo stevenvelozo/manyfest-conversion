@@ -15,6 +15,7 @@ let _PictCLIProgram = new libCLIProgram(
 		AutoAddConfigurationExplanationCommand: true
 	},
 	[
+		require('./commands/Manyfest-Conversion-Command-ExtractFields.js'),
 		require('./commands/Manyfest-Conversion-Command-BuildMappings.js'),
 		require('./commands/Manyfest-Conversion-Command-FillPDF.js'),
 		require('./commands/Manyfest-Conversion-Command-FillXLSX.js'),

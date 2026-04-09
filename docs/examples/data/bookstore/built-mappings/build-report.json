@@ -1,0 +1,33 @@
+{
+    "RowsParsed": 42,
+    "RowsSkipped": 2,
+    "RowsAccepted": 40,
+    "FormCount": 2,
+    "Forms": {
+        "AcquisitionOrder.pdf": {
+            "DescriptorCount": 27,
+            "UnmappedCount": 2,
+            "TargetFileType": "PDF"
+        },
+        "InventorySheet.xlsx": {
+            "DescriptorCount": 13,
+            "UnmappedCount": 0,
+            "TargetFileType": "XLSX"
+        }
+    },
+    "SkipReasons": [
+        {
+            "Row": 28,
+            "TargetFile": "AcquisitionOrder.pdf",
+            "FieldName": "receiver_signature",
+            "Reason": "Missing Form Input Address"
+        },
+        {
+            "Row": 29,
+            "TargetFile": "AcquisitionOrder.pdf",
+            "FieldName": "receiver_date",
+            "Reason": "Missing Form Input Address"
+        }
+    ],
+    "Errors": []
+}

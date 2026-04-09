@@ -1,0 +1,39 @@
+{
+	"ReportData":
+	{
+		"DocumentType": "IRS-W9",
+		"IDDocument": 2047,
+		"W9Data":
+		{
+			"LegalName": "Ada Lovelace",
+			"BusinessName": "",
+			"Classification":
+			{
+				"Individual": "1",
+				"CCorp": "",
+				"SCorp": "",
+				"Partnership": "",
+				"Trust": "",
+				"LLC": "",
+				"LLCTaxClass": ""
+			},
+			"ExemptPayeeCode": "",
+			"FATCAReportingCode": "",
+			"Address":
+			{
+				"Street": "1 Analytical Engine Way",
+				"CityStateZip": "Cambridge, MA 02139"
+			},
+			"RequesterNameAndAddress": "Charles Babbage Associates, LLC\n99 Difference Lane\nBoston, MA 02116",
+			"AccountNumbers": "CONTRACTOR-2026-LOVELACE",
+			"TaxIdentification":
+			{
+				"SSN1": "123",
+				"SSN2": "45",
+				"SSN3": "6789",
+				"EIN1": "",
+				"EIN2": ""
+			}
+		}
+	}
+}

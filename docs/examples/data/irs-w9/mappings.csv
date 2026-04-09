@@ -1,0 +1,23 @@
+Sort,PDF File,Field Type,Field Name,Form,Document Data Long Filler,Form Input Address,Form Input Address Long,Notes
+1,fw9.pdf,Text,topmostSubform[0].Page1[0].f1_01[0],IRS-W9,W9Data.,LegalName,W9Data.LegalName,Line 1 - Name (as shown on income tax return)
+2,fw9.pdf,Text,topmostSubform[0].Page1[0].f1_02[0],IRS-W9,W9Data.,BusinessName,W9Data.BusinessName,Line 2 - Business name / disregarded entity name (if different from above)
+10,fw9.pdf,Button,topmostSubform[0].Page1[0].FederalClassification[0].c1_1[0],IRS-W9,W9Data.,Classification.Individual,W9Data.Classification.Individual,Line 3a checkbox - Individual/sole proprietor
+11,fw9.pdf,Button,topmostSubform[0].Page1[0].FederalClassification[0].c1_1[1],IRS-W9,W9Data.,Classification.CCorp,W9Data.Classification.CCorp,Line 3a checkbox - C corporation
+12,fw9.pdf,Button,topmostSubform[0].Page1[0].FederalClassification[0].c1_1[2],IRS-W9,W9Data.,Classification.SCorp,W9Data.Classification.SCorp,Line 3a checkbox - S corporation
+13,fw9.pdf,Button,topmostSubform[0].Page1[0].FederalClassification[0].c1_1[3],IRS-W9,W9Data.,Classification.Partnership,W9Data.Classification.Partnership,Line 3a checkbox - Partnership
+14,fw9.pdf,Button,topmostSubform[0].Page1[0].FederalClassification[0].c1_1[4],IRS-W9,W9Data.,Classification.Trust,W9Data.Classification.Trust,Line 3a checkbox - Trust/estate
+15,fw9.pdf,Button,topmostSubform[0].Page1[0].FederalClassification[0].c1_1[5],IRS-W9,W9Data.,Classification.LLC,W9Data.Classification.LLC,Line 3a checkbox - Limited liability company
+16,fw9.pdf,Text,topmostSubform[0].Page1[0].FederalClassification[0].f1_03[0],IRS-W9,W9Data.,Classification.LLCTaxClass,W9Data.Classification.LLCTaxClass,Line 3a - LLC tax classification (C / S / P)
+20,fw9.pdf,Text,topmostSubform[0].Page1[0].f1_04[0],IRS-W9,W9Data.,ExemptPayeeCode,W9Data.ExemptPayeeCode,Line 4 - Exempt payee code (if any)
+21,fw9.pdf,Text,topmostSubform[0].Page1[0].f1_05[0],IRS-W9,W9Data.,FATCAReportingCode,W9Data.FATCAReportingCode,Line 4 - FATCA reporting code (if any)
+30,fw9.pdf,Text,topmostSubform[0].Page1[0].f1_06[0],IRS-W9,W9Data.,Address.Street,W9Data.Address.Street,Line 5 - Address (number street and apt. or suite no.)
+31,fw9.pdf,Text,topmostSubform[0].Page1[0].f1_07[0],IRS-W9,W9Data.,Address.CityStateZip,W9Data.Address.CityStateZip,Line 6 - City state and ZIP code
+40,fw9.pdf,Text,topmostSubform[0].Page1[0].f1_08[0],IRS-W9,W9Data.,RequesterNameAndAddress,W9Data.RequesterNameAndAddress,Requester's name and address (optional)
+41,fw9.pdf,Text,topmostSubform[0].Page1[0].f1_09[0],IRS-W9,W9Data.,AccountNumbers,W9Data.AccountNumbers,List account number(s) here (optional)
+50,fw9.pdf,Text,topmostSubform[0].Page1[0].SSN[0].f1_11[0],IRS-W9,W9Data.,TaxIdentification.SSN1,W9Data.TaxIdentification.SSN1,Part I - Social Security Number digits 1-3
+51,fw9.pdf,Text,topmostSubform[0].Page1[0].SSN[0].f1_12[0],IRS-W9,W9Data.,TaxIdentification.SSN2,W9Data.TaxIdentification.SSN2,Part I - Social Security Number digits 4-5
+52,fw9.pdf,Text,topmostSubform[0].Page1[0].SSN[0].f1_13[0],IRS-W9,W9Data.,TaxIdentification.SSN3,W9Data.TaxIdentification.SSN3,Part I - Social Security Number digits 6-9
+53,fw9.pdf,Text,topmostSubform[0].Page1[0].EIN[0].f1_14[0],IRS-W9,W9Data.,TaxIdentification.EIN1,W9Data.TaxIdentification.EIN1,Part I - Employer Identification Number digits 1-2
+54,fw9.pdf,Text,topmostSubform[0].Page1[0].EIN[0].f1_15[0],IRS-W9,W9Data.,TaxIdentification.EIN2,W9Data.TaxIdentification.EIN2,Part I - Employer Identification Number digits 3-9
+60,fw9.pdf,Text,topmostSubform[0].Page1[0].f1_10[0],IRS-W9,W9Data.,,,,Part II - Signature (by hand)
+61,fw9.pdf,Text,topmostSubform[0].Page1[0].Date[0],IRS-W9,W9Data.,,,,Part II - Date (by hand)

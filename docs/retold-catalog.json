@@ -1,0 +1,146 @@
+{
+	"Generated": "2026-04-09T06:07:18.178Z",
+	"GitHubOrg": "stevenvelozo",
+	"DefaultBranch": "master",
+	"Groups": [
+		{
+			"Name": "Debug",
+			"Key": "debug",
+			"Description": "",
+			"Modules": [
+				{
+					"Name": "dist",
+					"Repo": "dist",
+					"Group": "debug",
+					"Branch": "master",
+					"HasDocs": false,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": []
+				}
+			]
+		},
+		{
+			"Name": "Dist",
+			"Key": "dist",
+			"Description": "",
+			"Modules": [
+				{
+					"Name": "indoctrinate_content_staging",
+					"Repo": "indoctrinate_content_staging",
+					"Group": "dist",
+					"Branch": "master",
+					"HasDocs": false,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": []
+				}
+			]
+		},
+		{
+			"Name": "Docs",
+			"Key": "docs",
+			"Description": "",
+			"Modules": [
+				{
+					"Name": "api",
+					"Repo": "api",
+					"Group": "docs",
+					"Branch": "master",
+					"HasDocs": true,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": [
+						"api/conversion-report.md",
+						"api/mapping-manyfest-builder.md",
+						"api/pdf-form-filler.md",
+						"api/xlsx-form-filler.md"
+					]
+				},
+				{
+					"Name": "cli",
+					"Repo": "cli",
+					"Group": "docs",
+					"Branch": "master",
+					"HasDocs": true,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": [
+						"cli/build-mappings.md",
+						"cli/convert-batch.md",
+						"cli/extract-fields.md",
+						"cli/fill-pdf.md",
+						"cli/fill-xlsx.md",
+						"cli/overview.md"
+					]
+				},
+				{
+					"Name": "css",
+					"Repo": "css",
+					"Group": "docs",
+					"Branch": "master",
+					"HasDocs": true,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": [
+						"css/docuserve.css"
+					]
+				},
+				{
+					"Name": "examples",
+					"Repo": "examples",
+					"Group": "docs",
+					"Branch": "master",
+					"HasDocs": true,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": [
+						"examples/README.md",
+						"examples/bookstore-acquisition.md",
+						"examples/data/bookstore/built-mappings/AcquisitionOrder.pdf.mapping.json",
+						"examples/data/bookstore/built-mappings/InventorySheet.xlsx.mapping.json",
+						"examples/data/bookstore/built-mappings/build-report.json",
+						"examples/data/bookstore/mappings.csv",
+						"examples/data/bookstore/source.json",
+						"examples/data/irs-w9/built-mappings/build-report.json",
+						"examples/data/irs-w9/built-mappings/fw9.pdf.mapping.json",
+						"examples/data/irs-w9/mappings.csv",
+						"examples/data/irs-w9/source.json",
+						"examples/data/library/built-mappings/CatalogInventory.xlsx.mapping.json",
+						"examples/data/library/mappings.csv",
+						"examples/data/library/source.json",
+						"examples/irs-w9.md",
+						"examples/library-catalog.md"
+					]
+				}
+			]
+		},
+		{
+			"Name": "Source",
+			"Key": "source",
+			"Description": "",
+			"Modules": [
+				{
+					"Name": "cli",
+					"Repo": "cli",
+					"Group": "source",
+					"Branch": "master",
+					"HasDocs": false,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": []
+				},
+				{
+					"Name": "services",
+					"Repo": "services",
+					"Group": "source",
+					"Branch": "master",
+					"HasDocs": false,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": []
+				}
+			]
+		}
+	]
+}

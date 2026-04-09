@@ -1,0 +1,66 @@
+{
+	"ReportData":
+	{
+		"DocumentType": "Bookstore-Acquisition",
+		"IDDocument": 18274,
+		"OrderData":
+		{
+			"Header":
+			{
+				"PONumber": "PO-2026-0042",
+				"OrderDate": "2026-04-08",
+				"VendorName": "Ingram Book Company",
+				"VendorAccount": "INGR-00914",
+				"ShipTo": "Fable & Ink Books, 112 Willow Lane, Portland, OR 97201",
+				"BuyerName": "Marguerite Chen",
+				"BuyerEmail": "marguerite@fableandink.example.com",
+				"Notes": "Please hold until the end of the month; our stockroom is being renovated."
+			},
+			"LineItems":
+			[
+				{
+					"ISBN": "9780143127796",
+					"Title": "Sapiens: A Brief History of Humankind",
+					"Author": "Yuval Noah Harari",
+					"QtyOrdered": "12",
+					"UnitPrice": "14.99"
+				},
+				{
+					"ISBN": "9780451524935",
+					"Title": "1984",
+					"Author": "George Orwell",
+					"QtyOrdered": "8",
+					"UnitPrice": "9.99"
+				},
+				{
+					"ISBN": "9780316769488",
+					"Title": "The Catcher in the Rye",
+					"Author": "J.D. Salinger",
+					"QtyOrdered": "5",
+					"UnitPrice": "11.50"
+				},
+				{
+					"ISBN": "9780307277671",
+					"Title": "The Road",
+					"Author": "Cormac McCarthy",
+					"QtyOrdered": "6",
+					"UnitPrice": "13.00"
+				},
+				{
+					"ISBN": "9780679783268",
+					"Title": "Pride and Prejudice",
+					"Author": "Jane Austen",
+					"QtyOrdered": "10",
+					"UnitPrice": "7.50"
+				}
+			],
+			"Totals":
+			{
+				"QtyTotal": "41",
+				"Subtotal": "461.80",
+				"Tax": "27.71",
+				"Grand": "489.51"
+			}
+		}
+	}
+}

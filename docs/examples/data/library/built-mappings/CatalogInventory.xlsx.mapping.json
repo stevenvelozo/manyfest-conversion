@@ -1,0 +1,242 @@
+{
+    "Scope": "Library-Catalog::CatalogInventory.xlsx",
+    "SourceRootAddress": "ReportData.Catalog",
+    "TargetFile": "CatalogInventory.xlsx",
+    "TargetFileType": "XLSX",
+    "SourceDocumentType": "Library-Catalog",
+    "SourceRootFullPath": "Catalog.",
+    "Descriptors": {
+        "Header.LibraryName": {
+            "Name": "CatalogInventory.xlsx/'Summary'!B2",
+            "Hash": "CatalogInventory___Summary__B2",
+            "DataType": "String",
+            "TargetFieldName": "'Summary'!B2",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Header.LibraryName",
+            "SourceAddressLong": "Catalog.Header.LibraryName"
+        },
+        "Header.BranchCode": {
+            "Name": "CatalogInventory.xlsx/'Summary'!B3",
+            "Hash": "CatalogInventory___Summary__B3",
+            "DataType": "String",
+            "TargetFieldName": "'Summary'!B3",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Header.BranchCode",
+            "SourceAddressLong": "Catalog.Header.BranchCode"
+        },
+        "Header.Librarian": {
+            "Name": "CatalogInventory.xlsx/'Summary'!B4",
+            "Hash": "CatalogInventory___Summary__B4",
+            "DataType": "String",
+            "TargetFieldName": "'Summary'!B4",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Header.Librarian",
+            "SourceAddressLong": "Catalog.Header.Librarian"
+        },
+        "Header.AuditDate": {
+            "Name": "CatalogInventory.xlsx/'Summary'!B5",
+            "Hash": "CatalogInventory___Summary__B5",
+            "DataType": "String",
+            "TargetFieldName": "'Summary'!B5",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Header.AuditDate",
+            "SourceAddressLong": "Catalog.Header.AuditDate"
+        },
+        "Summary.TotalBooks": {
+            "Name": "CatalogInventory.xlsx/'Summary'!B7",
+            "Hash": "CatalogInventory___Summary__B7",
+            "DataType": "String",
+            "TargetFieldName": "'Summary'!B7",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Summary.TotalBooks",
+            "SourceAddressLong": "Catalog.Summary.TotalBooks"
+        },
+        "Summary.TotalCopies": {
+            "Name": "CatalogInventory.xlsx/'Summary'!B8",
+            "Hash": "CatalogInventory___Summary__B8",
+            "DataType": "String",
+            "TargetFieldName": "'Summary'!B8",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Summary.TotalCopies",
+            "SourceAddressLong": "Catalog.Summary.TotalCopies"
+        },
+        "Summary.CheckedOut": {
+            "Name": "CatalogInventory.xlsx/'Summary'!B9",
+            "Hash": "CatalogInventory___Summary__B9",
+            "DataType": "String",
+            "TargetFieldName": "'Summary'!B9",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Summary.CheckedOut",
+            "SourceAddressLong": "Catalog.Summary.CheckedOut"
+        },
+        "Summary.OnShelf": {
+            "Name": "CatalogInventory.xlsx/'Summary'!B10",
+            "Hash": "CatalogInventory___Summary__B10",
+            "DataType": "String",
+            "TargetFieldName": "'Summary'!B10",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Summary.OnShelf",
+            "SourceAddressLong": "Catalog.Summary.OnShelf"
+        },
+        "Fiction[].CallNumber": {
+            "Name": "CatalogInventory.xlsx/'Fiction'!A3-22",
+            "Hash": "CatalogInventory___Fiction__A3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Fiction'!A3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Fiction[].CallNumber",
+            "SourceAddressLong": "Catalog.Fiction[].CallNumber"
+        },
+        "Fiction[].Title": {
+            "Name": "CatalogInventory.xlsx/'Fiction'!B3-22",
+            "Hash": "CatalogInventory___Fiction__B3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Fiction'!B3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Fiction[].Title",
+            "SourceAddressLong": "Catalog.Fiction[].Title"
+        },
+        "Fiction[].Author": {
+            "Name": "CatalogInventory.xlsx/'Fiction'!C3-22",
+            "Hash": "CatalogInventory___Fiction__C3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Fiction'!C3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Fiction[].Author",
+            "SourceAddressLong": "Catalog.Fiction[].Author"
+        },
+        "Fiction[].CopiesOnHand": {
+            "Name": "CatalogInventory.xlsx/'Fiction'!D3-22",
+            "Hash": "CatalogInventory___Fiction__D3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Fiction'!D3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Fiction[].CopiesOnHand",
+            "SourceAddressLong": "Catalog.Fiction[].CopiesOnHand"
+        },
+        "Fiction[].LastCheckoutDate": {
+            "Name": "CatalogInventory.xlsx/'Fiction'!E3-22",
+            "Hash": "CatalogInventory___Fiction__E3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Fiction'!E3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Fiction[].LastCheckoutDate",
+            "SourceAddressLong": "Catalog.Fiction[].LastCheckoutDate"
+        },
+        "NonFiction[].CallNumber": {
+            "Name": "CatalogInventory.xlsx/'Non-Fiction'!A3-22",
+            "Hash": "CatalogInventory___Non_Fiction__A3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Non-Fiction'!A3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "NonFiction[].CallNumber",
+            "SourceAddressLong": "Catalog.NonFiction[].CallNumber"
+        },
+        "NonFiction[].Title": {
+            "Name": "CatalogInventory.xlsx/'Non-Fiction'!B3-22",
+            "Hash": "CatalogInventory___Non_Fiction__B3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Non-Fiction'!B3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "NonFiction[].Title",
+            "SourceAddressLong": "Catalog.NonFiction[].Title"
+        },
+        "NonFiction[].Author": {
+            "Name": "CatalogInventory.xlsx/'Non-Fiction'!C3-22",
+            "Hash": "CatalogInventory___Non_Fiction__C3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Non-Fiction'!C3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "NonFiction[].Author",
+            "SourceAddressLong": "Catalog.NonFiction[].Author"
+        },
+        "NonFiction[].CopiesOnHand": {
+            "Name": "CatalogInventory.xlsx/'Non-Fiction'!D3-22",
+            "Hash": "CatalogInventory___Non_Fiction__D3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Non-Fiction'!D3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "NonFiction[].CopiesOnHand",
+            "SourceAddressLong": "Catalog.NonFiction[].CopiesOnHand"
+        },
+        "NonFiction[].Subject": {
+            "Name": "CatalogInventory.xlsx/'Non-Fiction'!E3-22",
+            "Hash": "CatalogInventory___Non_Fiction__E3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Non-Fiction'!E3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "NonFiction[].Subject",
+            "SourceAddressLong": "Catalog.NonFiction[].Subject"
+        },
+        "Childrens[].CallNumber": {
+            "Name": "CatalogInventory.xlsx/'Childrens'!A3-22",
+            "Hash": "CatalogInventory___Childrens__A3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Childrens'!A3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Childrens[].CallNumber",
+            "SourceAddressLong": "Catalog.Childrens[].CallNumber"
+        },
+        "Childrens[].Title": {
+            "Name": "CatalogInventory.xlsx/'Childrens'!B3-22",
+            "Hash": "CatalogInventory___Childrens__B3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Childrens'!B3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Childrens[].Title",
+            "SourceAddressLong": "Catalog.Childrens[].Title"
+        },
+        "Childrens[].Author": {
+            "Name": "CatalogInventory.xlsx/'Childrens'!C3-22",
+            "Hash": "CatalogInventory___Childrens__C3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Childrens'!C3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Childrens[].Author",
+            "SourceAddressLong": "Catalog.Childrens[].Author"
+        },
+        "Childrens[].CopiesOnHand": {
+            "Name": "CatalogInventory.xlsx/'Childrens'!D3-22",
+            "Hash": "CatalogInventory___Childrens__D3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Childrens'!D3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Childrens[].CopiesOnHand",
+            "SourceAddressLong": "Catalog.Childrens[].CopiesOnHand"
+        },
+        "Childrens[].AgeRange": {
+            "Name": "CatalogInventory.xlsx/'Childrens'!E3-22",
+            "Hash": "CatalogInventory___Childrens__E3_22",
+            "DataType": "String",
+            "TargetFieldName": "'Childrens'!E3-22",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Childrens[].AgeRange",
+            "SourceAddressLong": "Catalog.Childrens[].AgeRange"
+        }
+    },
+    "HashTranslations": {},
+    "UnmappedTargetFields": []
+}

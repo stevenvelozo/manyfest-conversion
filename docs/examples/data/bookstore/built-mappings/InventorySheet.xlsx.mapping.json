@@ -1,0 +1,142 @@
+{
+    "Scope": "Bookstore-Acquisition::InventorySheet.xlsx",
+    "SourceRootAddress": "ReportData.OrderData",
+    "TargetFile": "InventorySheet.xlsx",
+    "TargetFileType": "XLSX",
+    "SourceDocumentType": "Bookstore-Acquisition",
+    "SourceRootFullPath": "OrderData.",
+    "Descriptors": {
+        "Header.PONumber": {
+            "Name": "InventorySheet.xlsx/'Header'!B2",
+            "Hash": "InventorySheet___Header__B2",
+            "DataType": "String",
+            "TargetFieldName": "'Header'!B2",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Header.PONumber",
+            "SourceAddressLong": "OrderData.Header.PONumber"
+        },
+        "Header.OrderDate": {
+            "Name": "InventorySheet.xlsx/'Header'!B3",
+            "Hash": "InventorySheet___Header__B3",
+            "DataType": "String",
+            "TargetFieldName": "'Header'!B3",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Header.OrderDate",
+            "SourceAddressLong": "OrderData.Header.OrderDate"
+        },
+        "Header.VendorName": {
+            "Name": "InventorySheet.xlsx/'Header'!B4",
+            "Hash": "InventorySheet___Header__B4",
+            "DataType": "String",
+            "TargetFieldName": "'Header'!B4",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Header.VendorName",
+            "SourceAddressLong": "OrderData.Header.VendorName"
+        },
+        "Header.BuyerName": {
+            "Name": "InventorySheet.xlsx/'Header'!B5",
+            "Hash": "InventorySheet___Header__B5",
+            "DataType": "String",
+            "TargetFieldName": "'Header'!B5",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Header.BuyerName",
+            "SourceAddressLong": "OrderData.Header.BuyerName"
+        },
+        "LineItems[].ISBN": {
+            "Name": "InventorySheet.xlsx/'Line Items'!A3-14",
+            "Hash": "InventorySheet___Line_Items__A3_14",
+            "DataType": "String",
+            "TargetFieldName": "'Line Items'!A3-14",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "LineItems[].ISBN",
+            "SourceAddressLong": "OrderData.LineItems[].ISBN"
+        },
+        "LineItems[].Title": {
+            "Name": "InventorySheet.xlsx/'Line Items'!B3-14",
+            "Hash": "InventorySheet___Line_Items__B3_14",
+            "DataType": "String",
+            "TargetFieldName": "'Line Items'!B3-14",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "LineItems[].Title",
+            "SourceAddressLong": "OrderData.LineItems[].Title"
+        },
+        "LineItems[].Author": {
+            "Name": "InventorySheet.xlsx/'Line Items'!C3-14",
+            "Hash": "InventorySheet___Line_Items__C3_14",
+            "DataType": "String",
+            "TargetFieldName": "'Line Items'!C3-14",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "LineItems[].Author",
+            "SourceAddressLong": "OrderData.LineItems[].Author"
+        },
+        "LineItems[].QtyOrdered": {
+            "Name": "InventorySheet.xlsx/'Line Items'!D3-14",
+            "Hash": "InventorySheet___Line_Items__D3_14",
+            "DataType": "String",
+            "TargetFieldName": "'Line Items'!D3-14",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "LineItems[].QtyOrdered",
+            "SourceAddressLong": "OrderData.LineItems[].QtyOrdered"
+        },
+        "LineItems[].UnitPrice": {
+            "Name": "InventorySheet.xlsx/'Line Items'!E3-14",
+            "Hash": "InventorySheet___Line_Items__E3_14",
+            "DataType": "String",
+            "TargetFieldName": "'Line Items'!E3-14",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "LineItems[].UnitPrice",
+            "SourceAddressLong": "OrderData.LineItems[].UnitPrice"
+        },
+        "Totals.QtyTotal": {
+            "Name": "InventorySheet.xlsx/'Totals'!B2",
+            "Hash": "InventorySheet___Totals__B2",
+            "DataType": "String",
+            "TargetFieldName": "'Totals'!B2",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Totals.QtyTotal",
+            "SourceAddressLong": "OrderData.Totals.QtyTotal"
+        },
+        "Totals.Subtotal": {
+            "Name": "InventorySheet.xlsx/'Totals'!B3",
+            "Hash": "InventorySheet___Totals__B3",
+            "DataType": "String",
+            "TargetFieldName": "'Totals'!B3",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Totals.Subtotal",
+            "SourceAddressLong": "OrderData.Totals.Subtotal"
+        },
+        "Totals.Tax": {
+            "Name": "InventorySheet.xlsx/'Totals'!B4",
+            "Hash": "InventorySheet___Totals__B4",
+            "DataType": "String",
+            "TargetFieldName": "'Totals'!B4",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Totals.Tax",
+            "SourceAddressLong": "OrderData.Totals.Tax"
+        },
+        "Totals.Grand": {
+            "Name": "InventorySheet.xlsx/'Totals'!B5",
+            "Hash": "InventorySheet___Totals__B5",
+            "DataType": "String",
+            "TargetFieldName": "'Totals'!B5",
+            "TargetFieldType": "Text",
+            "SourceSortOrder": null,
+            "SourceAddressRaw": "Totals.Grand",
+            "SourceAddressLong": "OrderData.Totals.Grand"
+        }
+    },
+    "HashTranslations": {},
+    "UnmappedTargetFields": []
+}

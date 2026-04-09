@@ -1,0 +1,44 @@
+{
+	"ReportData":
+	{
+		"DocumentType": "Library-Catalog",
+		"IDDocument": 4091,
+		"Catalog":
+		{
+			"Header":
+			{
+				"LibraryName": "Willow Grove Public Library",
+				"BranchCode": "WGPL-MAIN",
+				"Librarian": "Ananya Patel",
+				"AuditDate": "2026-04-08"
+			},
+			"Summary":
+			{
+				"TotalBooks": "11",
+				"TotalCopies": "37",
+				"CheckedOut": "9",
+				"OnShelf": "28"
+			},
+			"Fiction":
+			[
+				{ "CallNumber": "FIC HAR",  "Title": "Sapiens",                "Author": "Yuval Noah Harari", "CopiesOnHand": "2", "LastCheckoutDate": "2026-03-21" },
+				{ "CallNumber": "FIC ORW",  "Title": "1984",                   "Author": "George Orwell",     "CopiesOnHand": "3", "LastCheckoutDate": "2026-04-01" },
+				{ "CallNumber": "FIC SAL",  "Title": "The Catcher in the Rye", "Author": "J.D. Salinger",     "CopiesOnHand": "1", "LastCheckoutDate": "2026-02-14" },
+				{ "CallNumber": "FIC MCC",  "Title": "The Road",               "Author": "Cormac McCarthy",   "CopiesOnHand": "4", "LastCheckoutDate": "2026-03-29" },
+				{ "CallNumber": "FIC AUS",  "Title": "Pride and Prejudice",    "Author": "Jane Austen",       "CopiesOnHand": "2", "LastCheckoutDate": "2026-03-15" }
+			],
+			"NonFiction":
+			[
+				{ "CallNumber": "909 DIA",  "Title": "Guns, Germs, and Steel", "Author": "Jared Diamond", "CopiesOnHand": "2", "Subject": "World History" },
+				{ "CallNumber": "510 HOF",  "Title": "Godel, Escher, Bach",    "Author": "Douglas Hofstadter", "CopiesOnHand": "1", "Subject": "Mathematics" },
+				{ "CallNumber": "523 SAG",  "Title": "Cosmos",                 "Author": "Carl Sagan", "CopiesOnHand": "3", "Subject": "Astronomy" }
+			],
+			"Childrens":
+			[
+				{ "CallNumber": "E SEN",    "Title": "Where the Wild Things Are", "Author": "Maurice Sendak", "CopiesOnHand": "5", "AgeRange": "3-8" },
+				{ "CallNumber": "E EAS",    "Title": "The Very Hungry Caterpillar","Author": "Eric Carle",    "CopiesOnHand": "6", "AgeRange": "2-5" },
+				{ "CallNumber": "E ROW",    "Title": "Harry Potter and the Sorcerer's Stone", "Author": "J.K. Rowling", "CopiesOnHand": "8", "AgeRange": "8-12" }
+			]
+		}
+	}
+}
