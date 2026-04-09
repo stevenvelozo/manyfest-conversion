@@ -9,10 +9,10 @@ const libReadline = require('readline');
  * CSV column names (exact case) expected in the mappings CSV.
  */
 const CSV_COLUMN_SORT = 'Sort';
-const CSV_COLUMN_PDF_FILE = 'pdf_file';
-const CSV_COLUMN_FIELD_TYPE = 'field_type';
-const CSV_COLUMN_FIELD_NAME = 'field_name';
-const CSV_COLUMN_HL_FORM = 'HL Form';
+const CSV_COLUMN_PDF_FILE = 'PDF File';
+const CSV_COLUMN_FIELD_TYPE = 'Field Type';
+const CSV_COLUMN_FIELD_NAME = 'Field Name';
+const CSV_COLUMN_FORM = 'Form';
 const CSV_COLUMN_DATA_LONG_FILLER = 'Document Data Long Filler';
 const CSV_COLUMN_INPUT_ADDRESS = 'Form Input Address';
 const CSV_COLUMN_INPUT_ADDRESS_LONG = 'Form Input Address Long';
@@ -23,6 +23,11 @@ const CSV_COLUMN_NOTES = 'Notes';
  * on-disk sample JSONs (which have data nested under ReportData.FormData).
  * The platform envelope is usually AppData.DocumentData.ReportData.FormData,
  * so callers can override via options.
+ * 
+ * TODO: In the future, we may want to support per-row source root overrides via a 
+ * CSV column, but for now this is sufficient for the sample data and keeps the CSV simpler.
+ * 
+ * TODO: This should change to just an empty string once we know it's safe to do.
  */
 const DEFAULT_SOURCE_ROOT_ADDRESS = 'ReportData.FormData';
 
@@ -151,7 +156,7 @@ class MappingManyfestBuilder extends libFableServiceProviderBase
 		const tmpFieldType = (pRow[CSV_COLUMN_FIELD_TYPE] || 'Text').trim();
 		const tmpInputAddressRaw = (pRow[CSV_COLUMN_INPUT_ADDRESS] || '').trim();
 		const tmpInputAddress = this.normalizeSourceAddress(tmpInputAddressRaw);
-		const tmpSourceDocType = (pRow[CSV_COLUMN_HL_FORM] || '').trim();
+		const tmpSourceDocType = (pRow[CSV_COLUMN_FORM] || '').trim();
 		const tmpLongFiller = (pRow[CSV_COLUMN_DATA_LONG_FILLER] || '').trim();
 		const tmpLongAddress = (pRow[CSV_COLUMN_INPUT_ADDRESS_LONG] || '').trim();
 		const tmpNotes = (pRow[CSV_COLUMN_NOTES] || '').trim();
