@@ -1,5 +1,4 @@
-const Chai = require('chai');
-const Expect = Chai.expect;
+const libAssert = require('node:assert/strict');
 
 const libPict = require('pict');
 const libConversionReport = require('../source/services/Service-ConversionReport.js');
@@ -21,16 +20,16 @@ suite
 			{
 				const tmpSvc = buildService();
 				const tmpReport = tmpSvc.newReport('source.json', 'target.pdf');
-				Expect(tmpReport.SourceFile).to.equal('source.json');
-				Expect(tmpReport.TargetFile).to.equal('target.pdf');
-				Expect(tmpReport.Successes).to.deep.equal([]);
-				Expect(tmpReport.Warnings).to.deep.equal([]);
-				Expect(tmpReport.Errors).to.deep.equal([]);
-				Expect(tmpReport.Stats.SuccessCount).to.equal(0);
-				Expect(tmpReport.Stats.WarningCount).to.equal(0);
-				Expect(tmpReport.Stats.ErrorCount).to.equal(0);
-				Expect(tmpReport.Stats.TotalFields).to.equal(0);
-				Expect(tmpReport.Timestamp).to.be.a('string');
+				libAssert.equal(tmpReport.SourceFile, 'source.json');
+				libAssert.equal(tmpReport.TargetFile, 'target.pdf');
+				libAssert.deepEqual(tmpReport.Successes, []);
+				libAssert.deepEqual(tmpReport.Warnings, []);
+				libAssert.deepEqual(tmpReport.Errors, []);
+				libAssert.equal(tmpReport.Stats.SuccessCount, 0);
+				libAssert.equal(tmpReport.Stats.WarningCount, 0);
+				libAssert.equal(tmpReport.Stats.ErrorCount, 0);
+				libAssert.equal(tmpReport.Stats.TotalFields, 0);
+				libAssert.equal(typeof tmpReport.Timestamp, 'string');
 			});
 
 		test('log methods append and finalize recomputes stats',
@@ -46,13 +45,13 @@ suite
 
 				tmpSvc.finalize(tmpReport);
 
-				Expect(tmpReport.Stats.SuccessCount).to.equal(2);
-				Expect(tmpReport.Stats.WarningCount).to.equal(1);
-				Expect(tmpReport.Stats.ErrorCount).to.equal(1);
-				Expect(tmpReport.Stats.TotalFields).to.equal(4);
-				Expect(tmpReport.Successes[0]).to.deep.equal({ FieldName: 'fieldA', SourceAddress: 'H.A', Value: 'v1' });
-				Expect(tmpReport.Warnings[0].Message).to.equal('missing');
-				Expect(tmpReport.Errors[0].Message).to.equal('fail');
+				libAssert.equal(tmpReport.Stats.SuccessCount, 2);
+				libAssert.equal(tmpReport.Stats.WarningCount, 1);
+				libAssert.equal(tmpReport.Stats.ErrorCount, 1);
+				libAssert.equal(tmpReport.Stats.TotalFields, 4);
+				libAssert.deepEqual(tmpReport.Successes[0], { FieldName: 'fieldA', SourceAddress: 'H.A', Value: 'v1' });
+				libAssert.equal(tmpReport.Warnings[0].Message, 'missing');
+				libAssert.equal(tmpReport.Errors[0].Message, 'fail');
 			});
 
 		test('newReport carries scope from mapping manyfest if supplied',
@@ -65,8 +64,8 @@ suite
 						manifest: { SourceDocumentType: 'MI-CAG-Walbec' }
 					});
 				const tmpReport = tmpSvc.newReport('s.json', 't.pdf', tmpFakeManyfest);
-				Expect(tmpReport.MappingManyfestScope).to.equal('MI-CAG-Walbec::1859 - Coarse Agg Gravity.pdf');
-				Expect(tmpReport.SourceDocumentType).to.equal('MI-CAG-Walbec');
+				libAssert.equal(tmpReport.MappingManyfestScope, 'MI-CAG-Walbec::1859 - Coarse Agg Gravity.pdf');
+				libAssert.equal(tmpReport.SourceDocumentType, 'MI-CAG-Walbec');
 			});
 	}
 );

@@ -21,7 +21,7 @@ class ManyfestConversionCommandFillXLSX extends libCommandLineCommand
 		this.addCommand();
 	}
 
-	onRunAsync(fCallback)
+	async onRunAsync(fCallback)
 	{
 		const tmpOperationState = (
 			{
@@ -108,7 +108,7 @@ class ManyfestConversionCommandFillXLSX extends libCommandLineCommand
 
 		try
 		{
-			this.fable.XLSXFormFiller.fillXLSX(
+			await this.fable.XLSXFormFiller.fillXLSX(
 				tmpMappingManyfest,
 				tmpSourceData,
 				tmpOperationState.TemplateFilePath,

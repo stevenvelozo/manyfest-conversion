@@ -23,7 +23,7 @@ class ManyfestConversionCommandConvertBatch extends libCommandLineCommand
 		this.addCommand();
 	}
 
-	onRunAsync(fCallback)
+	async onRunAsync(fCallback)
 	{
 		const tmpOperationState = (
 			{
@@ -188,7 +188,7 @@ class ManyfestConversionCommandConvertBatch extends libCommandLineCommand
 					}
 					else if (tmpTargetFileType === 'XLSX')
 					{
-						this.fable.XLSXFormFiller.fillXLSX(tmpEntry.manyfest, tmpSourceData, tmpTemplatePath, tmpOutputPath, tmpReport, this.fable.ConversionReport);
+						await this.fable.XLSXFormFiller.fillXLSX(tmpEntry.manyfest, tmpSourceData, tmpTemplatePath, tmpOutputPath, tmpReport, this.fable.ConversionReport);
 					}
 					else
 					{

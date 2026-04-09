@@ -1,5 +1,4 @@
-const Chai = require('chai');
-const Expect = Chai.expect;
+const libAssert = require('node:assert/strict');
 
 const libPict = require('pict');
 const libManyfestConversion = require('../source/Manyfest-Conversion.js');
@@ -12,11 +11,11 @@ suite
 		test('exports all four service classes',
 			() =>
 			{
-				Expect(libManyfestConversion).to.be.an('object');
-				Expect(libManyfestConversion.MappingManyfestBuilder).to.be.a('function');
-				Expect(libManyfestConversion.PDFFormFiller).to.be.a('function');
-				Expect(libManyfestConversion.XLSXFormFiller).to.be.a('function');
-				Expect(libManyfestConversion.ConversionReport).to.be.a('function');
+				libAssert.equal(typeof libManyfestConversion, 'object');
+				libAssert.equal(typeof libManyfestConversion.MappingManyfestBuilder, 'function');
+				libAssert.equal(typeof libManyfestConversion.PDFFormFiller, 'function');
+				libAssert.equal(typeof libManyfestConversion.XLSXFormFiller, 'function');
+				libAssert.equal(typeof libManyfestConversion.ConversionReport, 'function');
 			});
 
 		test('services instantiate on a standalone Pict fable',
@@ -33,11 +32,11 @@ suite
 				const tmpXLSX = tmpFable.instantiateServiceProvider('XLSXFormFiller');
 				const tmpReport = tmpFable.instantiateServiceProvider('ConversionReport');
 
-				Expect(tmpBuilder).to.be.an('object');
-				Expect(tmpBuilder.serviceType).to.equal('MappingManyfestBuilder');
-				Expect(tmpPDF.serviceType).to.equal('PDFFormFiller');
-				Expect(tmpXLSX.serviceType).to.equal('XLSXFormFiller');
-				Expect(tmpReport.serviceType).to.equal('ConversionReport');
+				libAssert.equal(typeof tmpBuilder, 'object');
+				libAssert.equal(tmpBuilder.serviceType, 'MappingManyfestBuilder');
+				libAssert.equal(tmpPDF.serviceType, 'PDFFormFiller');
+				libAssert.equal(tmpXLSX.serviceType, 'XLSXFormFiller');
+				libAssert.equal(tmpReport.serviceType, 'ConversionReport');
 			});
 	}
 );

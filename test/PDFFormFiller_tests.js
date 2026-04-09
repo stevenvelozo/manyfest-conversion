@@ -1,5 +1,4 @@
-const Chai = require('chai');
-const Expect = Chai.expect;
+const libAssert = require('node:assert/strict');
 
 const libFS = require('fs');
 const libPath = require('path');
@@ -74,11 +73,11 @@ suite
 			() =>
 			{
 				const tmp = buildEnv();
-				Expect(tmp.filler.escapeXML('a & b')).to.equal('a &amp; b');
-				Expect(tmp.filler.escapeXML('<tag>')).to.equal('&lt;tag&gt;');
-				Expect(tmp.filler.escapeXML(`quotes: " '`)).to.equal('quotes: &quot; &apos;');
-				Expect(tmp.filler.escapeXML(null)).to.equal('');
-				Expect(tmp.filler.escapeXML(undefined)).to.equal('');
+				libAssert.equal(tmp.filler.escapeXML('a & b'), 'a &amp; b');
+				libAssert.equal(tmp.filler.escapeXML('<tag>'), '&lt;tag&gt;');
+				libAssert.equal(tmp.filler.escapeXML(`quotes: " '`), 'quotes: &quot; &apos;');
+				libAssert.equal(tmp.filler.escapeXML(null), '');
+				libAssert.equal(tmp.filler.escapeXML(undefined), '');
 			});
 
 		test('buildXFDF emits Text fields, skips Button fields with a warning, and warns on missing values',
@@ -91,18 +90,18 @@ suite
 
 				const tmpBuild = tmp.filler.buildXFDF(tmpManyfest, tmpSource, tmpReport, tmp.reporter);
 
-				Expect(tmpBuild.xfdf).to.be.a('string');
-				Expect(tmpBuild.fieldCount).to.equal(2);
+				libAssert.equal(typeof tmpBuild.xfdf, 'string');
+				libAssert.equal(tmpBuild.fieldCount, 2);
 
-				Expect(tmpBuild.xfdf).to.include('<field name="Text1"><value>Alice &amp; Bob</value></field>');
-				Expect(tmpBuild.xfdf).to.include('<field name="Text2"><value>&lt;important&gt;</value></field>');
-				Expect(tmpBuild.xfdf).to.not.include('Check Box3');
+				libAssert.ok(tmpBuild.xfdf.includes('<field name="Text1"><value>Alice &amp; Bob</value></field>'));
+				libAssert.ok(tmpBuild.xfdf.includes('<field name="Text2"><value>&lt;important&gt;</value></field>'));
+				libAssert.ok(!tmpBuild.xfdf.includes('Check Box3'));
 
 				tmp.reporter.finalize(tmpReport);
-				Expect(tmpReport.Stats.SuccessCount).to.equal(2);
-				Expect(tmpReport.Stats.WarningCount).to.equal(1);
-				Expect(tmpReport.Warnings[0].FieldName).to.equal('Check Box3');
-				Expect(tmpReport.Stats.ErrorCount).to.equal(0);
+				libAssert.equal(tmpReport.Stats.SuccessCount, 2);
+				libAssert.equal(tmpReport.Stats.WarningCount, 1);
+				libAssert.equal(tmpReport.Warnings[0].FieldName, 'Check Box3');
+				libAssert.equal(tmpReport.Stats.ErrorCount, 0);
 			});
 
 		test('buildXFDF emits warning when a source value is missing',
@@ -116,9 +115,9 @@ suite
 				tmp.filler.buildXFDF(tmpManyfest, tmpSource, tmpReport, tmp.reporter);
 				tmp.reporter.finalize(tmpReport);
 
-				Expect(tmpReport.Stats.SuccessCount).to.equal(1);
+				libAssert.equal(tmpReport.Stats.SuccessCount, 1);
 				// Missing note + skipped checkbox = 2 warnings.
-				Expect(tmpReport.Stats.WarningCount).to.equal(2);
+				libAssert.equal(tmpReport.Stats.WarningCount, 2);
 			});
 	}
 );
@@ -170,14 +169,11 @@ suite
 				try
 				{
 					tmpFiller.fillPDF(tmpManyfest1859, tmpSourceData, TEMPLATE_1859, tmpOutputPath, tmpReport, tmpReporter);
-					Expect(libFS.existsSync(tmpOutputPath)).to.equal(true);
+					libAssert.equal(libFS.existsSync(tmpOutputPath), true);
 
 					// Read back fields via pdftk dump_data_fields to assert A4 = "100.0".
 					const tmpDump = libChildProcess.spawnSync('pdftk', [tmpOutputPath, 'dump_data_fields'], { encoding: 'utf8' });
-					Expect(tmpDump.status, 'pdftk dump_data_fields exit').to.equal(0);
-					// Find the block for FieldName: A4.  pdftk output format:
-					//   FieldName: A4
-					//   FieldValue: 100.0
+					libAssert.equal(tmpDump.status, 0);
 					const tmpBlocks = tmpDump.stdout.split('---');
 					let tmpFoundValue = null;
 					for (const tmpBlock of tmpBlocks)
@@ -192,7 +188,7 @@ suite
 							break;
 						}
 					}
-					Expect(tmpFoundValue).to.equal('100.0');
+					libAssert.equal(tmpFoundValue, '100.0');
 				}
 				finally
 				{

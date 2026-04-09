@@ -1,5 +1,5 @@
 const libFableServiceProviderBase = require('fable-serviceproviderbase');
-const libXLSX = require('xlsx');
+const libExcelJS = require('exceljs');
 
 const libFS = require('fs');
 
@@ -7,10 +7,33 @@ const libFS = require('fs');
  * XLSXFormFiller
  *
  * Fills an Excel workbook from a platform JSON payload using a mapping
- * manyfest.  Each descriptor's TargetFieldName is a cell reference, either
- * fully-qualified with a sheet name (`'FIELD DATA SHEET'!E5` or
- * `FIELD DATA SHEET!E5`) or a bare cell coordinate (`E5`), in which case
- * the workbook's first sheet is used.
+ * manyfest.  Backed by exceljs (not the SheetJS community edition) so
+ * fonts, borders, fills, conditional formats, drawings, and other workbook
+ * theming survive the round-trip.
+ *
+ * Each descriptor's TargetFieldName is a cell reference, optionally with a
+ * sheet qualifier.  Three styles are supported:
+ *
+ *   E5                              - bare cell, default sheet
+ *   'FIELD DATA SHEET'!E5           - quoted sheet name
+ *   FIELD DATA SHEET!E5             - unquoted sheet name (with spaces)
+ *
+ * Cell ranges are supported in both the SheetJS-style and the hyphenated
+ * shorthand the Walbec-MDOT CSV uses:
+ *
+ *   'FIELD DATA SHEET'!O14:O25      - colon range, single column
+ *   'FIELD DATA SHEET'!A1:D5        - colon range, rectangular block
+ *   'FIELD DATA SHEET'!O14-25       - hyphen shorthand: O14 .. O25
+ *
+ * Source addresses may use Manyfest's normal dot/bracket syntax for scalar
+ * values, or the empty-bracket array-broadcast convention to pull a column
+ * out of an array of objects:
+ *
+ *   ExtractionGradationTable[].JMF
+ *
+ * resolves to the JMF field of every element in the ExtractionGradationTable
+ * array.  When paired with a target cell range the values are written into
+ * the range cell-by-cell (truncated or warned if the sizes do not match).
  */
 class XLSXFormFiller extends libFableServiceProviderBase
 {
@@ -22,103 +45,250 @@ class XLSXFormFiller extends libFableServiceProviderBase
 	}
 
 	/**
-	 * Parse a cell reference into { sheetName, cellAddress }.
-	 *
-	 *   "'FIELD DATA SHEET'!E5"  -> { sheetName: 'FIELD DATA SHEET', cellAddress: 'E5' }
-	 *   "FIELD DATA SHEET!E5"    -> { sheetName: 'FIELD DATA SHEET', cellAddress: 'E5' }
-	 *   "Sheet1!A1"              -> { sheetName: 'Sheet1',          cellAddress: 'A1' }
-	 *   "E5"                     -> { sheetName: null,              cellAddress: 'E5' }
+	 * Parse a target cell reference into { sheetName, cellAddresses[] }.
+	 * Always returns an array of A1 addresses (length 1 for single cells).
 	 */
-	parseCellReference(pRawRef)
+	parseTargetCellSpec(pRawRef)
 	{
 		if (!pRawRef || typeof(pRawRef) !== 'string')
 		{
-			return { sheetName: null, cellAddress: null };
+			return { sheetName: null, cellAddresses: [] };
 		}
 
 		const tmpTrimmed = pRawRef.trim();
 		const tmpBangIndex = tmpTrimmed.lastIndexOf('!');
-		if (tmpBangIndex < 0)
+
+		let tmpSheet = null;
+		let tmpCellPart = tmpTrimmed;
+		if (tmpBangIndex >= 0)
 		{
-			return { sheetName: null, cellAddress: tmpTrimmed };
+			tmpSheet = tmpTrimmed.substring(0, tmpBangIndex).trim();
+			tmpCellPart = tmpTrimmed.substring(tmpBangIndex + 1).trim();
+
+			// Strip any leading/trailing single quotes (the sample CSV mixes
+			// `'FIELD DATA SHEET'!E5` and `FIELD DATA SHEET'!E5`).
+			while (tmpSheet.length > 0 && tmpSheet.charAt(0) === "'")
+			{
+				tmpSheet = tmpSheet.substring(1);
+			}
+			while (tmpSheet.length > 0 && tmpSheet.charAt(tmpSheet.length - 1) === "'")
+			{
+				tmpSheet = tmpSheet.substring(0, tmpSheet.length - 1);
+			}
 		}
 
-		let tmpSheet = tmpTrimmed.substring(0, tmpBangIndex).trim();
-		const tmpCell = tmpTrimmed.substring(tmpBangIndex + 1).trim();
-
-		// Strip wrapping or stray single quotes.  Excel's convention for sheet
-		// names with spaces/special characters is 'Sheet Name', but the sample
-		// CSV has asymmetric variants like `FIELD DATA SHEET'!E5` that we
-		// also need to tolerate.
-		while (tmpSheet.length > 0 && tmpSheet.charAt(0) === "'")
-		{
-			tmpSheet = tmpSheet.substring(1);
-		}
-		while (tmpSheet.length > 0 && tmpSheet.charAt(tmpSheet.length - 1) === "'")
-		{
-			tmpSheet = tmpSheet.substring(0, tmpSheet.length - 1);
-		}
-
-		return { sheetName: tmpSheet, cellAddress: tmpCell };
+		const tmpAddresses = this.expandCellRange(tmpCellPart);
+		return { sheetName: tmpSheet, cellAddresses: tmpAddresses };
 	}
 
 	/**
-	 * Write a value into a cell on a SheetJS workbook.  Creates the cell
-	 * if it does not already exist and updates the sheet's !ref range so
-	 * the written cell is included in subsequent writes.
+	 * Expand a cell-or-range string into a flat A1-style address list.
+	 *
+	 *   'E5'      -> ['E5']
+	 *   'O14-25'  -> ['O14','O15',...,'O25']     (hyphen shorthand: same column)
+	 *   'O14:O25' -> ['O14','O15',...,'O25']     (colon range, single column)
+	 *   'A1:D5'   -> ['A1','B1','C1','D1','A2',...] (colon range, row-major)
 	 */
-	setCellValue(pWorkbook, pSheetName, pCellAddress, pValue)
+	expandCellRange(pRangeString)
 	{
-		const tmpSheet = pWorkbook.Sheets[pSheetName];
-		if (!tmpSheet)
+		if (!pRangeString || typeof(pRangeString) !== 'string')
 		{
-			throw new Error(`Sheet [${pSheetName}] not found in workbook.`);
+			return [];
+		}
+		const tmpRange = pRangeString.trim();
+
+		// Hyphen shorthand: <Col><StartRow>-<EndRow>  e.g. O14-25
+		const tmpHyphenMatch = tmpRange.match(/^([A-Z]+)(\d+)-(\d+)$/);
+		if (tmpHyphenMatch)
+		{
+			const tmpCol = tmpHyphenMatch[1];
+			const tmpStart = parseInt(tmpHyphenMatch[2], 10);
+			const tmpEnd = parseInt(tmpHyphenMatch[3], 10);
+			const tmpResult = [];
+			if (tmpStart <= tmpEnd)
+			{
+				for (let i = tmpStart; i <= tmpEnd; i++)
+				{
+					tmpResult.push(`${tmpCol}${i}`);
+				}
+			}
+			return tmpResult;
 		}
 
-		// Parse the A1-style address into {c, r} so we can extend the sheet
-		// range if the cell falls outside the current used area.
-		const tmpCellCoord = libXLSX.utils.decode_cell(pCellAddress);
-
-		const tmpCurrentRef = tmpSheet['!ref'];
-		if (tmpCurrentRef)
+		// Colon range: <Col1><Row1>:<Col2><Row2>  e.g. A1:D5
+		const tmpColonMatch = tmpRange.match(/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/);
+		if (tmpColonMatch)
 		{
-			const tmpRange = libXLSX.utils.decode_range(tmpCurrentRef);
-			if (tmpCellCoord.r < tmpRange.s.r)
+			const tmpStartCol = this.columnLettersToNumber(tmpColonMatch[1]);
+			const tmpStartRow = parseInt(tmpColonMatch[2], 10);
+			const tmpEndCol = this.columnLettersToNumber(tmpColonMatch[3]);
+			const tmpEndRow = parseInt(tmpColonMatch[4], 10);
+			const tmpResult = [];
+			for (let r = tmpStartRow; r <= tmpEndRow; r++)
 			{
-				tmpRange.s.r = tmpCellCoord.r;
+				for (let c = tmpStartCol; c <= tmpEndCol; c++)
+				{
+					tmpResult.push(`${this.columnNumberToLetters(c)}${r}`);
+				}
 			}
-			if (tmpCellCoord.c < tmpRange.s.c)
-			{
-				tmpRange.s.c = tmpCellCoord.c;
-			}
-			if (tmpCellCoord.r > tmpRange.e.r)
-			{
-				tmpRange.e.r = tmpCellCoord.r;
-			}
-			if (tmpCellCoord.c > tmpRange.e.c)
-			{
-				tmpRange.e.c = tmpCellCoord.c;
-			}
-			tmpSheet['!ref'] = libXLSX.utils.encode_range(tmpRange);
-		}
-		else
-		{
-			tmpSheet['!ref'] = libXLSX.utils.encode_range(
-				{ s: { c: tmpCellCoord.c, r: tmpCellCoord.r }, e: { c: tmpCellCoord.c, r: tmpCellCoord.r } });
+			return tmpResult;
 		}
 
-		// Use a string-typed cell since platform payloads stringify everything
-		// (including numeric and boolean values).  The target spreadsheets are
-		// designed for human review, not downstream formula math.
-		tmpSheet[pCellAddress] = { t: 's', v: String(pValue), w: String(pValue) };
+		// Single cell: <Col><Row>
+		const tmpCellMatch = tmpRange.match(/^([A-Z]+)(\d+)$/);
+		if (tmpCellMatch)
+		{
+			return [tmpRange];
+		}
+
+		// Unrecognized — return as-is so the caller can surface a clear error.
+		return [tmpRange];
 	}
 
 	/**
-	 * End-to-end fill.  Loads the template, writes each mapped descriptor
-	 * into its target cell, writes the workbook out, and finalizes the
-	 * report.
+	 * Convert "A" -> 1, "Z" -> 26, "AA" -> 27, etc.
 	 */
-	fillXLSX(pMappingManyfest, pSourceData, pTemplateXLSXPath, pOutputXLSXPath, pReport, pConversionReportService)
+	columnLettersToNumber(pLetters)
+	{
+		let tmpNum = 0;
+		for (let i = 0; i < pLetters.length; i++)
+		{
+			tmpNum = tmpNum * 26 + (pLetters.charCodeAt(i) - 64);
+		}
+		return tmpNum;
+	}
+
+	/**
+	 * Convert 1 -> "A", 27 -> "AA", etc.
+	 */
+	columnNumberToLetters(pNumber)
+	{
+		let tmpResult = '';
+		let tmpN = pNumber;
+		while (tmpN > 0)
+		{
+			const tmpRem = (tmpN - 1) % 26;
+			tmpResult = String.fromCharCode(65 + tmpRem) + tmpResult;
+			tmpN = Math.floor((tmpN - 1) / 26);
+		}
+		return tmpResult;
+	}
+
+	/**
+	 * Resolve a (possibly array-broadcast) source address against the source
+	 * data using the mapping manyfest.  Returns an object describing the
+	 * outcome:
+	 *
+	 *   { kind: 'scalar', value }
+	 *   { kind: 'array',  values: [...] }   (the prefix[].suffix expansion)
+	 *   { kind: 'missing' }                 (resolved to null/undefined)
+	 *   { kind: 'error', message }          (could not resolve)
+	 */
+	resolveSourceValue(pMappingManyfest, pSourceData, pFullAddress)
+	{
+		if (!pFullAddress || typeof(pFullAddress) !== 'string')
+		{
+			return { kind: 'error', message: 'Empty source address.' };
+		}
+
+		const tmpEmptyBracketIndex = pFullAddress.indexOf('[]');
+		if (tmpEmptyBracketIndex < 0)
+		{
+			let tmpValue;
+			try
+			{
+				tmpValue = pMappingManyfest.getValueAtAddress(pSourceData, pFullAddress);
+			}
+			catch (pError)
+			{
+				return { kind: 'error', message: `Error resolving source address: ${pError.message}` };
+			}
+			if (typeof(tmpValue) === 'undefined' || tmpValue === null)
+			{
+				return { kind: 'missing' };
+			}
+			if (typeof(tmpValue) === 'object')
+			{
+				return { kind: 'error', message: 'Source address resolved to an object/array, not a scalar.' };
+			}
+			return { kind: 'scalar', value: tmpValue };
+		}
+
+		// Array-broadcast: prefix[].suffix
+		const tmpPrefix = pFullAddress.substring(0, tmpEmptyBracketIndex);
+		// Skip the "[]" itself, then the optional leading "." in the suffix.
+		let tmpSuffix = pFullAddress.substring(tmpEmptyBracketIndex + 2);
+		if (tmpSuffix.startsWith('.'))
+		{
+			tmpSuffix = tmpSuffix.substring(1);
+		}
+
+		let tmpArray;
+		try
+		{
+			tmpArray = pMappingManyfest.getValueAtAddress(pSourceData, tmpPrefix);
+		}
+		catch (pError)
+		{
+			return { kind: 'error', message: `Error resolving array prefix [${tmpPrefix}]: ${pError.message}` };
+		}
+		if (!Array.isArray(tmpArray))
+		{
+			return { kind: 'error', message: `Source array prefix [${tmpPrefix}] did not resolve to an array.` };
+		}
+
+		const tmpValues = [];
+		for (let i = 0; i < tmpArray.length; i++)
+		{
+			const tmpElementAddress = tmpSuffix
+				? `${tmpPrefix}[${i}].${tmpSuffix}`
+				: `${tmpPrefix}[${i}]`;
+			let tmpElementValue;
+			try
+			{
+				tmpElementValue = pMappingManyfest.getValueAtAddress(pSourceData, tmpElementAddress);
+			}
+			catch (pError)
+			{
+				tmpValues.push({ ok: false, message: `Error at index ${i}: ${pError.message}` });
+				continue;
+			}
+			if (typeof(tmpElementValue) === 'undefined' || tmpElementValue === null)
+			{
+				tmpValues.push({ ok: false, message: `Element at index ${i} is missing or null.` });
+			}
+			else if (typeof(tmpElementValue) === 'object')
+			{
+				tmpValues.push({ ok: false, message: `Element at index ${i} is an object/array, not a scalar.` });
+			}
+			else
+			{
+				tmpValues.push({ ok: true, value: tmpElementValue });
+			}
+		}
+		return { kind: 'array', values: tmpValues };
+	}
+
+	/**
+	 * Write a single value into a cell on an exceljs worksheet, preserving
+	 * the cell's existing style.  Setting cell.value on an exceljs Cell
+	 * leaves the style metadata intact, which is the whole point of using
+	 * exceljs over the SheetJS community edition for this filler.
+	 */
+	writeCellValue(pWorksheet, pCellAddress, pValue)
+	{
+		const tmpCell = pWorksheet.getCell(pCellAddress);
+		// Coerce to string because the platform payloads stringify everything
+		// and the target spreadsheets are designed for human review, not
+		// downstream formula math.
+		tmpCell.value = String(pValue);
+	}
+
+	/**
+	 * End-to-end fill.  Returns a Promise that resolves to the (annotated)
+	 * report.  exceljs's read/write are async so the whole pipeline is async.
+	 */
+	async fillXLSX(pMappingManyfest, pSourceData, pTemplateXLSXPath, pOutputXLSXPath, pReport, pConversionReportService)
 	{
 		if (!libFS.existsSync(pTemplateXLSXPath))
 		{
@@ -127,8 +297,16 @@ class XLSXFormFiller extends libFableServiceProviderBase
 			throw new Error(`Template XLSX does not exist: ${pTemplateXLSXPath}`);
 		}
 
-		const tmpWorkbook = libXLSX.readFile(pTemplateXLSXPath, { cellStyles: true });
-		const tmpDefaultSheetName = tmpWorkbook.SheetNames[0];
+		const tmpWorkbook = new libExcelJS.Workbook();
+		await tmpWorkbook.xlsx.readFile(pTemplateXLSXPath);
+
+		// Determine a default sheet name (the first worksheet).
+		let tmpDefaultSheetName = null;
+		if (tmpWorkbook.worksheets.length > 0)
+		{
+			tmpDefaultSheetName = tmpWorkbook.worksheets[0].name;
+		}
+
 		const tmpManifestData = pMappingManyfest.manifest || {};
 		const tmpSourceRoot = tmpManifestData.SourceRootAddress || '';
 
@@ -145,44 +323,9 @@ class XLSXFormFiller extends libFableServiceProviderBase
 			const tmpTargetFieldRaw = tmpDescriptor.TargetFieldName || '';
 			const tmpFullAddress = this.joinAddress(tmpSourceRoot, tmpRelativeAddress);
 
-			let tmpValue;
-			try
-			{
-				tmpValue = pMappingManyfest.getValueAtAddress(pSourceData, tmpFullAddress);
-			}
-			catch (pError)
-			{
-				pConversionReportService.logError(
-					pReport,
-					tmpTargetFieldRaw,
-					tmpFullAddress,
-					`Error resolving source address: ${pError.message}`);
-				continue;
-			}
-
-			if (typeof(tmpValue) === 'undefined' || tmpValue === null)
-			{
-				pConversionReportService.logWarning(
-					pReport,
-					tmpTargetFieldRaw,
-					tmpFullAddress,
-					'Source address did not resolve to a value in the payload.');
-				continue;
-			}
-
-			if (typeof(tmpValue) === 'object')
-			{
-				pConversionReportService.logError(
-					pReport,
-					tmpTargetFieldRaw,
-					tmpFullAddress,
-					'Source address resolved to an object/array, not a scalar.');
-				continue;
-			}
-
-			const tmpParsed = this.parseCellReference(tmpTargetFieldRaw);
-			const tmpSheetName = tmpParsed.sheetName || tmpDefaultSheetName;
-			if (!tmpParsed.cellAddress)
+			const tmpTargetSpec = this.parseTargetCellSpec(tmpTargetFieldRaw);
+			const tmpSheetName = tmpTargetSpec.sheetName || tmpDefaultSheetName;
+			if (!tmpTargetSpec.cellAddresses || tmpTargetSpec.cellAddresses.length === 0)
 			{
 				pConversionReportService.logError(
 					pReport,
@@ -192,22 +335,120 @@ class XLSXFormFiller extends libFableServiceProviderBase
 				continue;
 			}
 
-			try
-			{
-				this.setCellValue(tmpWorkbook, tmpSheetName, tmpParsed.cellAddress, tmpValue);
-				pConversionReportService.logSuccess(pReport, tmpTargetFieldRaw, tmpFullAddress, tmpValue);
-			}
-			catch (pError)
+			const tmpWorksheet = tmpWorkbook.getWorksheet(tmpSheetName);
+			if (!tmpWorksheet)
 			{
 				pConversionReportService.logError(
 					pReport,
 					tmpTargetFieldRaw,
 					tmpFullAddress,
-					`Error writing cell: ${pError.message}`);
+					`Sheet [${tmpSheetName}] not found in workbook.`);
+				continue;
+			}
+
+			const tmpResolved = this.resolveSourceValue(pMappingManyfest, pSourceData, tmpFullAddress);
+
+			if (tmpResolved.kind === 'error')
+			{
+				pConversionReportService.logError(pReport, tmpTargetFieldRaw, tmpFullAddress, tmpResolved.message);
+				continue;
+			}
+
+			if (tmpResolved.kind === 'missing')
+			{
+				pConversionReportService.logWarning(
+					pReport,
+					tmpTargetFieldRaw,
+					tmpFullAddress,
+					'Source address did not resolve to a value in the payload.');
+				continue;
+			}
+
+			if (tmpResolved.kind === 'scalar')
+			{
+				if (tmpTargetSpec.cellAddresses.length === 1)
+				{
+					try
+					{
+						this.writeCellValue(tmpWorksheet, tmpTargetSpec.cellAddresses[0], tmpResolved.value);
+						pConversionReportService.logSuccess(pReport, tmpTargetFieldRaw, tmpFullAddress, tmpResolved.value);
+					}
+					catch (pError)
+					{
+						pConversionReportService.logError(
+							pReport,
+							tmpTargetFieldRaw,
+							tmpFullAddress,
+							`Error writing cell: ${pError.message}`);
+					}
+				}
+				else
+				{
+					pConversionReportService.logWarning(
+						pReport,
+						tmpTargetFieldRaw,
+						tmpFullAddress,
+						`Scalar source paired with a ${tmpTargetSpec.cellAddresses.length}-cell range; refusing to broadcast a single value.`);
+				}
+				continue;
+			}
+
+			// Array source.  Pair element-by-element with the target cells.
+			const tmpArrayValues = tmpResolved.values;
+			const tmpRangeSize = tmpTargetSpec.cellAddresses.length;
+			const tmpPaired = Math.min(tmpArrayValues.length, tmpRangeSize);
+
+			for (let j = 0; j < tmpPaired; j++)
+			{
+				const tmpElement = tmpArrayValues[j];
+				const tmpCellAddress = tmpTargetSpec.cellAddresses[j];
+				if (!tmpElement.ok)
+				{
+					pConversionReportService.logWarning(
+						pReport,
+						`${tmpTargetFieldRaw} -> ${tmpCellAddress}`,
+						`${tmpFullAddress} [${j}]`,
+						tmpElement.message);
+					continue;
+				}
+				try
+				{
+					this.writeCellValue(tmpWorksheet, tmpCellAddress, tmpElement.value);
+					pConversionReportService.logSuccess(
+						pReport,
+						`${tmpTargetFieldRaw} -> ${tmpCellAddress}`,
+						`${tmpFullAddress} [${j}]`,
+						tmpElement.value);
+				}
+				catch (pError)
+				{
+					pConversionReportService.logError(
+						pReport,
+						`${tmpTargetFieldRaw} -> ${tmpCellAddress}`,
+						`${tmpFullAddress} [${j}]`,
+						`Error writing cell: ${pError.message}`);
+				}
+			}
+
+			if (tmpArrayValues.length > tmpRangeSize)
+			{
+				pConversionReportService.logWarning(
+					pReport,
+					tmpTargetFieldRaw,
+					tmpFullAddress,
+					`Source array has ${tmpArrayValues.length} elements but target range has ${tmpRangeSize} cells; truncated ${tmpArrayValues.length - tmpRangeSize} value(s).`);
+			}
+			else if (tmpArrayValues.length < tmpRangeSize)
+			{
+				pConversionReportService.logWarning(
+					pReport,
+					tmpTargetFieldRaw,
+					tmpFullAddress,
+					`Source array has ${tmpArrayValues.length} elements but target range has ${tmpRangeSize} cells; ${tmpRangeSize - tmpArrayValues.length} cell(s) left untouched.`);
 			}
 		}
 
-		libXLSX.writeFile(tmpWorkbook, pOutputXLSXPath);
+		await tmpWorkbook.xlsx.writeFile(pOutputXLSXPath);
 		pConversionReportService.finalize(pReport);
 		return pReport;
 	}
