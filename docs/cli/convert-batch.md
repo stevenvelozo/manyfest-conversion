@@ -59,7 +59,7 @@ Warnings alone never fail the exit.
 For a (source, mapping) pair to produce an artifact:
 
 1. `source.ReportData.DocumentType === mapping.SourceDocumentType` (exact match)
-2. `<templates-dir>/<mapping.TargetFile>` exists on disk (with `.xslx`→`.xlsx` fallback for typos)
+2. `<templates-dir>/<mapping.TargetFile>` exists on disk (with `.xslx`->`.xlsx` fallback for typos)
 
 If a source JSON's `DocumentType` does not match any loaded mapping, a warning is logged and the source is skipped:
 
@@ -159,7 +159,7 @@ The source JSON's `ReportData.DocumentType` doesn't match any mapping manyfest i
 
 ### `Template file [X] not found; skipping this output.`
 
-The mapping manyfest's `TargetFile` doesn't exist in the templates directory. Check the filename exactly (case-sensitive on Linux/macOS). The `.xslx` → `.xlsx` fallback only applies to that specific typo.
+The mapping manyfest's `TargetFile` doesn't exist in the templates directory. Check the filename exactly (case-sensitive on Linux/macOS). The `.xslx` -> `.xlsx` fallback only applies to that specific typo.
 
 ### Many warnings about "Source address did not resolve"
 

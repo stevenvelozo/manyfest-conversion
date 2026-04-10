@@ -167,7 +167,7 @@ Example: `LineItems[].Price` resolves to 3 elements but the target range is `B3-
 
 ## Column letters and indices
 
-Column letters follow Excel's convention. The filler handles the letter↔index conversion internally:
+Column letters follow Excel's convention. The filler handles the letter<->index conversion internally:
 
 | Letters | Index |
 |---------|-------|

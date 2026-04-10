@@ -49,7 +49,7 @@ This document is the complete reference for the file format.
 | `TargetFileType` | string | yes | `'PDF'` or `'XLSX'`. Determines which filler service runs. |
 | `SourceDocumentType` | string | yes | The `ReportData.DocumentType` value that a source JSON must carry for `convert-batch` to route it to this mapping. |
 | `SourceRootFullPath` | string | no | The original "long filler" from the CSV, preserved for reference. Not used at runtime. |
-| `Descriptors` | object | yes | Map of relative source address → descriptor. One entry per mapped target field. |
+| `Descriptors` | object | yes | Map of relative source address -> descriptor. One entry per mapped target field. |
 | `HashTranslations` | object | no | Optional hash-translation table; see the Manyfest docs. Usually `{}`. |
 | `UnmappedTargetFields` | array | no | Flat list of target fields that exist in the form but have no source mapping yet. Not used at runtime; exists to surface work for the CSV author. |
 

@@ -1,6 +1,6 @@
 # Examples
 
-Three non-construction examples walking through the full `build-mappings → fill` pipeline. Each example ships with:
+Three non-construction examples walking through the full `build-mappings -> fill` pipeline. Each example ships with:
 
 - A **source CSV** of field mappings
 - A **sample source JSON** payload
@@ -17,7 +17,7 @@ A fictional bookstore (Fable & Ink Books) issues purchase orders to a book distr
 
 - A simple header-plus-line-items data shape
 - Scalar fills for header fields
-- Array broadcast for the line-item table into a range of XLSX cells (`LineItems[].Title → 'Line Items'!B3-14`)
+- Array broadcast for the line-item table into a range of XLSX cells (`LineItems[].Title -> 'Line Items'!B3-14`)
 - Override of `SourceRootAddress` to handle a non-default envelope
 
 ### 2. [Library Catalog Inventory](library-catalog.md)

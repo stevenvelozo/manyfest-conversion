@@ -132,8 +132,8 @@ Every stage is a Fable service. The CLI (`mfconv`) is a thin `pict-service-comma
 
 ## Features
 
-- **PDF → Skeleton CSV** -- extract every fillable field from an existing PDF (via `pdftk dump_data_fields`) and emit a ready-to-edit mapping CSV so you never have to hand-enumerate form fields
-- **CSV → Mapping Manyfest** -- bootstrap one mapping manyfest per target form from a single flat CSV
+- **PDF -> Skeleton CSV** -- extract every fillable field from an existing PDF (via `pdftk dump_data_fields`) and emit a ready-to-edit mapping CSV so you never have to hand-enumerate form fields
+- **CSV -> Mapping Manyfest** -- bootstrap one mapping manyfest per target form from a single flat CSV
 - **Unmapped target tracking** -- CSV rows with no source address are still recorded as `UnmappedTargetFields` so authors can see what remains to be mapped
 - **Configurable source root** -- every mapping carries a `SourceRootAddress` (e.g. `ReportData.FormData`) that is prepended to each descriptor address at resolution time
 - **PDF form filling** -- via `pdftk` and XFDF, with XML-safe escaping and warn-and-skip for checkbox/Button fields

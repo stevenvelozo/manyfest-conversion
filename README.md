@@ -160,12 +160,12 @@ Comprehensive documentation is available in the [docs](./docs) folder:
                           filled.<ext>.report.json
 ```
 
-Every stage is a Fable service. The CLI is a thin `pict-service-commandlineutility` wrapper that instantiates the services on a Fable instance and calls their public methods. You can skip the CLI entirely and drive the services directly in your own code — see [Implementation Reference](docs/implementation-reference.md).
+Every stage is a Fable service. The CLI is a thin `pict-service-commandlineutility` wrapper that instantiates the services on a Fable instance and calls their public methods. You can skip the CLI entirely and drive the services directly in your own code -- see [Implementation Reference](docs/implementation-reference.md).
 
 ## Features
 
-- **PDF → Skeleton CSV** -- extract every fillable field from an existing PDF (via `pdftk dump_data_fields`) and emit a ready-to-edit mapping CSV so you never have to hand-enumerate form fields
-- **CSV → Mapping Manyfest** -- bootstrap one mapping manyfest per target form from a single flat CSV
+- **PDF -> Skeleton CSV** -- extract every fillable field from an existing PDF (via `pdftk dump_data_fields`) and emit a ready-to-edit mapping CSV so you never have to hand-enumerate form fields
+- **CSV -> Mapping Manyfest** -- bootstrap one mapping manyfest per target form from a single flat CSV
 - **Unmapped target tracking** -- CSV rows with no source address are still recorded as `UnmappedTargetFields` so authors can see what remains to be mapped
 - **Configurable source root** -- every mapping carries a `SourceRootAddress` (e.g. `ReportData.FormData`) that's prepended at resolution time, so the same mapping can run against both platform-envelope and raw payloads
 - **PDF form filling** -- via `pdftk` and XFDF, with XML-safe escaping and warn-and-skip for checkbox/Button fields

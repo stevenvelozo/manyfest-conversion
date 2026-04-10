@@ -465,7 +465,7 @@ tmpXLSX.expandCellRange('A1:C2');   // ['A1','B1','C1','A2','B2','C2']  (row-maj
 
 #### `columnLettersToNumber(pLetters)` / `columnNumberToLetters(pNumber)`
 
-Column letter ↔ column index conversions for rectangular range expansion. 1-indexed.
+Column letter <-> column index conversions for rectangular range expansion. 1-indexed.
 
 ```javascript
 tmpXLSX.columnLettersToNumber('A');  // 1
