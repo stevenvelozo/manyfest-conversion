@@ -1,4 +1,4 @@
-# Manyfest Conversion <small>1</small>
+# Manyfest Conversion
 
 > Describe and execute JSON-to-PDF and JSON-to-XLSX form fills with mapping manyfests
 
