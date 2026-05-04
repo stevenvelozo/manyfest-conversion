@@ -201,6 +201,39 @@ class PDFFormFiller extends libFableServiceProviderBase
 	}
 
 	/**
+	 * Normalize a descriptor (old or new shape) to a flat array of target
+	 * specs.  Mirrors MappingManyfestBuilder.normalizeDescriptorTargets so
+	 * the PDF filler stays self-sufficient even when the builder service
+	 * is not registered on the fable.
+	 *
+	 * @param {object} pDescriptor
+	 * @returns {Array<object>}
+	 */
+	normalizeDescriptorTargets(pDescriptor)
+	{
+		if (!pDescriptor || typeof(pDescriptor) !== 'object')
+		{
+			return [];
+		}
+		if (Array.isArray(pDescriptor.Targets) && pDescriptor.Targets.length > 0)
+		{
+			return pDescriptor.Targets;
+		}
+		if (pDescriptor.TargetFieldName)
+		{
+			return [
+				{
+					TargetFieldName: pDescriptor.TargetFieldName,
+					TargetFieldType: pDescriptor.TargetFieldType || 'Text',
+					SourceSortOrder: (typeof(pDescriptor.SourceSortOrder) === 'undefined') ? null : pDescriptor.SourceSortOrder,
+					Notes: pDescriptor.Notes || null
+				}
+			];
+		}
+		return [];
+	}
+
+	/**
 	 * Escape a string for safe inclusion inside an XFDF <value> element.
 	 */
 	escapeXML(pValue)
@@ -245,60 +278,79 @@ class PDFFormFiller extends libFableServiceProviderBase
 				continue;
 			}
 
-			const tmpFieldName = tmpDescriptor.TargetFieldName || tmpRelativeAddress;
-			const tmpFullAddress = this.joinAddress(tmpSourceRoot, tmpRelativeAddress);
-
-			// PDF Button/Checkbox rows are explicitly warn-and-skip in v1.
-			if ((tmpDescriptor.TargetFieldType || '').toLowerCase() === 'button')
+			const tmpTargets = this.normalizeDescriptorTargets(tmpDescriptor);
+			if (tmpTargets.length === 0)
 			{
-				pConversionReportService.logWarning(
-					pReport,
-					tmpFieldName,
-					tmpFullAddress,
-					'PDF checkbox/Button mappings are warn-and-skip in manyfest-conversion v1.');
 				continue;
 			}
 
+			const tmpFullAddress = this.joinAddress(tmpSourceRoot, tmpRelativeAddress);
+
+			// Resolve the source value ONCE per descriptor.  Every target on
+			// this descriptor consumes the same value.
 			let tmpValue;
+			let tmpResolutionError = null;
 			try
 			{
 				tmpValue = pMappingManyfest.getValueAtAddress(pSourceData, tmpFullAddress);
 			}
 			catch (pError)
 			{
-				pConversionReportService.logError(
-					pReport,
-					tmpFieldName,
-					tmpFullAddress,
-					`Error resolving source address: ${pError.message}`);
-				continue;
+				tmpResolutionError = pError;
 			}
 
-			if (typeof(tmpValue) === 'undefined' || tmpValue === null)
+			for (let t = 0; t < tmpTargets.length; t++)
 			{
-				pConversionReportService.logWarning(
-					pReport,
-					tmpFieldName,
-					tmpFullAddress,
-					'Source address did not resolve to a value in the payload.');
-				continue;
+				const tmpTarget = tmpTargets[t] || {};
+				const tmpFieldName = tmpTarget.TargetFieldName || tmpRelativeAddress;
+
+				if (tmpResolutionError)
+				{
+					pConversionReportService.logError(
+						pReport,
+						tmpFieldName,
+						tmpFullAddress,
+						`Error resolving source address: ${tmpResolutionError.message}`);
+					continue;
+				}
+
+				// PDF Button/Checkbox rows are explicitly warn-and-skip in v1.
+				if ((tmpTarget.TargetFieldType || '').toLowerCase() === 'button')
+				{
+					pConversionReportService.logWarning(
+						pReport,
+						tmpFieldName,
+						tmpFullAddress,
+						'PDF checkbox/Button mappings are warn-and-skip in manyfest-conversion v1.');
+					continue;
+				}
+
+				if (typeof(tmpValue) === 'undefined' || tmpValue === null)
+				{
+					pConversionReportService.logWarning(
+						pReport,
+						tmpFieldName,
+						tmpFullAddress,
+						'Source address did not resolve to a value in the payload.');
+					continue;
+				}
+
+				if (typeof(tmpValue) === 'object')
+				{
+					pConversionReportService.logError(
+						pReport,
+						tmpFieldName,
+						tmpFullAddress,
+						'Source address resolved to an object/array, not a scalar.');
+					continue;
+				}
+
+				const tmpEscapedName = this.escapeXML(tmpFieldName);
+				const tmpEscapedValue = this.escapeXML(tmpValue);
+				tmpFieldLines.push(`    <field name="${tmpEscapedName}"><value>${tmpEscapedValue}</value></field>`);
+
+				pConversionReportService.logSuccess(pReport, tmpFieldName, tmpFullAddress, tmpValue);
 			}
-
-			if (typeof(tmpValue) === 'object')
-			{
-				pConversionReportService.logError(
-					pReport,
-					tmpFieldName,
-					tmpFullAddress,
-					'Source address resolved to an object/array, not a scalar.');
-				continue;
-			}
-
-			const tmpEscapedName = this.escapeXML(tmpFieldName);
-			const tmpEscapedValue = this.escapeXML(tmpValue);
-			tmpFieldLines.push(`    <field name="${tmpEscapedName}"><value>${tmpEscapedValue}</value></field>`);
-
-			pConversionReportService.logSuccess(pReport, tmpFieldName, tmpFullAddress, tmpValue);
 		}
 
 		const tmpXFDF = [

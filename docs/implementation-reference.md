@@ -212,6 +212,34 @@ tmpBuilder.joinAddress('ReportData.FormData', 'CAGTable[0].CAGB'); // 'ReportDat
 tmpBuilder.joinAddress('', 'H.CtrlSec');                           // 'H.CtrlSec'
 ```
 
+#### `normalizeDescriptorTargets(pDescriptor)`
+
+Normalizes a descriptor (old 1:1 shape or new 1:N shape) to a flat array of target specs. This is the contract every filler consumes.
+
+```javascript
+// New 1:N shape -> returned verbatim
+tmpBuilder.normalizeDescriptorTargets(
+    {
+        Targets:
+        [
+            { TargetFieldName: 'job_number', TargetFieldType: 'Text' },
+            { TargetFieldName: 'header_job_no', TargetFieldType: 'Text' }
+        ]
+    });
+// => [{TargetFieldName: 'job_number', ...}, {TargetFieldName: 'header_job_no', ...}]
+
+// Legacy 1:1 shape -> wrapped in a single-element array
+tmpBuilder.normalizeDescriptorTargets(
+    {
+        TargetFieldName: 'po_number',
+        TargetFieldType: 'Text',
+        SourceSortOrder: 1
+    });
+// => [{TargetFieldName: 'po_number', TargetFieldType: 'Text', SourceSortOrder: 1, Notes: null}]
+```
+
+Returns `[]` for null / non-object / no-target descriptors. The same helper is implemented (with identical semantics) on `PDFFormFiller.normalizeDescriptorTargets` and `XLSXFormFiller.normalizeDescriptorTargets` so each filler stays self-sufficient even when the builder is not registered on the fable.
+
 #### `escapeCSVCell(pValue)`
 
 Quotes a cell value for safe inclusion in a CSV row. Returns the value unchanged unless it contains a comma, double quote, or newline, in which case it wraps the value in double quotes and doubles any inner double quotes. Used internally by `generateMappingCSVFromFields`.
@@ -315,6 +343,10 @@ if (!tmpBinary)
     console.error('pdftk is not installed');
 }
 ```
+
+#### `normalizeDescriptorTargets(pDescriptor)`
+
+Same contract as `MappingManyfestBuilder.normalizeDescriptorTargets` -- carried locally so the PDF filler can resolve descriptors without depending on the builder being registered on the fable. Used by `buildXFDF` to iterate one or many target fields per descriptor.
 
 #### `dumpFormFields(pPDFPath)`
 
@@ -433,6 +465,10 @@ Same contract as `MappingManyfestBuilder.joinAddress`. Used internally by `build
 Fills Excel workbooks via `exceljs`. All methods are sync except `fillXLSX`, which returns a Promise because `exceljs` is async.
 
 ### Methods
+
+#### `normalizeDescriptorTargets(pDescriptor)`
+
+Same contract as `MappingManyfestBuilder.normalizeDescriptorTargets` -- carried locally so the XLSX filler can resolve descriptors without depending on the builder being registered on the fable. Used by `fillXLSX` to iterate one or many target cell references per descriptor (the source value is resolved once per descriptor, then each target receives it via the existing scalar/array/missing/error decision tree).
 
 #### `parseTargetCellSpec(pRawRef)`
 

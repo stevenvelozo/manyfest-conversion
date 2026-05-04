@@ -270,6 +270,39 @@ class XLSXFormFiller extends libFableServiceProviderBase
 	}
 
 	/**
+	 * Normalize a descriptor (old or new shape) to a flat array of target
+	 * specs.  Mirrors MappingManyfestBuilder.normalizeDescriptorTargets so
+	 * the XLSX filler stays self-sufficient even when the builder service
+	 * is not registered on the fable.
+	 *
+	 * @param {object} pDescriptor
+	 * @returns {Array<object>}
+	 */
+	normalizeDescriptorTargets(pDescriptor)
+	{
+		if (!pDescriptor || typeof(pDescriptor) !== 'object')
+		{
+			return [];
+		}
+		if (Array.isArray(pDescriptor.Targets) && pDescriptor.Targets.length > 0)
+		{
+			return pDescriptor.Targets;
+		}
+		if (pDescriptor.TargetFieldName)
+		{
+			return [
+				{
+					TargetFieldName: pDescriptor.TargetFieldName,
+					TargetFieldType: pDescriptor.TargetFieldType || 'Text',
+					SourceSortOrder: (typeof(pDescriptor.SourceSortOrder) === 'undefined') ? null : pDescriptor.SourceSortOrder,
+					Notes: pDescriptor.Notes || null
+				}
+			];
+		}
+		return [];
+	}
+
+	/**
 	 * Write a single value into a cell on an exceljs worksheet, preserving
 	 * the cell's existing style.  Setting cell.value on an exceljs Cell
 	 * leaves the style metadata intact, which is the whole point of using
@@ -320,131 +353,144 @@ class XLSXFormFiller extends libFableServiceProviderBase
 				continue;
 			}
 
-			const tmpTargetFieldRaw = tmpDescriptor.TargetFieldName || '';
+			const tmpTargets = this.normalizeDescriptorTargets(tmpDescriptor);
+			if (tmpTargets.length === 0)
+			{
+				continue;
+			}
+
 			const tmpFullAddress = this.joinAddress(tmpSourceRoot, tmpRelativeAddress);
 
-			const tmpTargetSpec = this.parseTargetCellSpec(tmpTargetFieldRaw);
-			const tmpSheetName = tmpTargetSpec.sheetName || tmpDefaultSheetName;
-			if (!tmpTargetSpec.cellAddresses || tmpTargetSpec.cellAddresses.length === 0)
-			{
-				pConversionReportService.logError(
-					pReport,
-					tmpTargetFieldRaw,
-					tmpFullAddress,
-					`Could not parse cell reference [${tmpTargetFieldRaw}]`);
-				continue;
-			}
-
-			const tmpWorksheet = tmpWorkbook.getWorksheet(tmpSheetName);
-			if (!tmpWorksheet)
-			{
-				pConversionReportService.logError(
-					pReport,
-					tmpTargetFieldRaw,
-					tmpFullAddress,
-					`Sheet [${tmpSheetName}] not found in workbook.`);
-				continue;
-			}
-
+			// Resolve the source value ONCE per descriptor.  Every target on
+			// this descriptor consumes the same value (or array of values).
 			const tmpResolved = this.resolveSourceValue(pMappingManyfest, pSourceData, tmpFullAddress);
 
-			if (tmpResolved.kind === 'error')
+			for (let t = 0; t < tmpTargets.length; t++)
 			{
-				pConversionReportService.logError(pReport, tmpTargetFieldRaw, tmpFullAddress, tmpResolved.message);
-				continue;
-			}
+				const tmpTarget = tmpTargets[t] || {};
+				const tmpTargetFieldRaw = tmpTarget.TargetFieldName || '';
 
-			if (tmpResolved.kind === 'missing')
-			{
-				pConversionReportService.logWarning(
-					pReport,
-					tmpTargetFieldRaw,
-					tmpFullAddress,
-					'Source address did not resolve to a value in the payload.');
-				continue;
-			}
-
-			if (tmpResolved.kind === 'scalar')
-			{
-				if (tmpTargetSpec.cellAddresses.length === 1)
+				const tmpTargetSpec = this.parseTargetCellSpec(tmpTargetFieldRaw);
+				const tmpSheetName = tmpTargetSpec.sheetName || tmpDefaultSheetName;
+				if (!tmpTargetSpec.cellAddresses || tmpTargetSpec.cellAddresses.length === 0)
 				{
-					try
-					{
-						this.writeCellValue(tmpWorksheet, tmpTargetSpec.cellAddresses[0], tmpResolved.value);
-						pConversionReportService.logSuccess(pReport, tmpTargetFieldRaw, tmpFullAddress, tmpResolved.value);
-					}
-					catch (pError)
-					{
-						pConversionReportService.logError(
-							pReport,
-							tmpTargetFieldRaw,
-							tmpFullAddress,
-							`Error writing cell: ${pError.message}`);
-					}
+					pConversionReportService.logError(
+						pReport,
+						tmpTargetFieldRaw,
+						tmpFullAddress,
+						`Could not parse cell reference [${tmpTargetFieldRaw}]`);
+					continue;
 				}
-				else
+
+				const tmpWorksheet = tmpWorkbook.getWorksheet(tmpSheetName);
+				if (!tmpWorksheet)
+				{
+					pConversionReportService.logError(
+						pReport,
+						tmpTargetFieldRaw,
+						tmpFullAddress,
+						`Sheet [${tmpSheetName}] not found in workbook.`);
+					continue;
+				}
+
+				if (tmpResolved.kind === 'error')
+				{
+					pConversionReportService.logError(pReport, tmpTargetFieldRaw, tmpFullAddress, tmpResolved.message);
+					continue;
+				}
+
+				if (tmpResolved.kind === 'missing')
 				{
 					pConversionReportService.logWarning(
 						pReport,
 						tmpTargetFieldRaw,
 						tmpFullAddress,
-						`Scalar source paired with a ${tmpTargetSpec.cellAddresses.length}-cell range; refusing to broadcast a single value.`);
+						'Source address did not resolve to a value in the payload.');
+					continue;
 				}
-				continue;
-			}
 
-			// Array source.  Pair element-by-element with the target cells.
-			const tmpArrayValues = tmpResolved.values;
-			const tmpRangeSize = tmpTargetSpec.cellAddresses.length;
-			const tmpPaired = Math.min(tmpArrayValues.length, tmpRangeSize);
+				if (tmpResolved.kind === 'scalar')
+				{
+					if (tmpTargetSpec.cellAddresses.length === 1)
+					{
+						try
+						{
+							this.writeCellValue(tmpWorksheet, tmpTargetSpec.cellAddresses[0], tmpResolved.value);
+							pConversionReportService.logSuccess(pReport, tmpTargetFieldRaw, tmpFullAddress, tmpResolved.value);
+						}
+						catch (pError)
+						{
+							pConversionReportService.logError(
+								pReport,
+								tmpTargetFieldRaw,
+								tmpFullAddress,
+								`Error writing cell: ${pError.message}`);
+						}
+					}
+					else
+					{
+						pConversionReportService.logWarning(
+							pReport,
+							tmpTargetFieldRaw,
+							tmpFullAddress,
+							`Scalar source paired with a ${tmpTargetSpec.cellAddresses.length}-cell range; refusing to broadcast a single value.`);
+					}
+					continue;
+				}
 
-			for (let j = 0; j < tmpPaired; j++)
-			{
-				const tmpElement = tmpArrayValues[j];
-				const tmpCellAddress = tmpTargetSpec.cellAddresses[j];
-				if (!tmpElement.ok)
+				// Array source.  Pair element-by-element with the target cells.
+				const tmpArrayValues = tmpResolved.values;
+				const tmpRangeSize = tmpTargetSpec.cellAddresses.length;
+				const tmpPaired = Math.min(tmpArrayValues.length, tmpRangeSize);
+
+				for (let j = 0; j < tmpPaired; j++)
+				{
+					const tmpElement = tmpArrayValues[j];
+					const tmpCellAddress = tmpTargetSpec.cellAddresses[j];
+					if (!tmpElement.ok)
+					{
+						pConversionReportService.logWarning(
+							pReport,
+							`${tmpTargetFieldRaw} -> ${tmpCellAddress}`,
+							`${tmpFullAddress} [${j}]`,
+							tmpElement.message);
+						continue;
+					}
+					try
+					{
+						this.writeCellValue(tmpWorksheet, tmpCellAddress, tmpElement.value);
+						pConversionReportService.logSuccess(
+							pReport,
+							`${tmpTargetFieldRaw} -> ${tmpCellAddress}`,
+							`${tmpFullAddress} [${j}]`,
+							tmpElement.value);
+					}
+					catch (pError)
+					{
+						pConversionReportService.logError(
+							pReport,
+							`${tmpTargetFieldRaw} -> ${tmpCellAddress}`,
+							`${tmpFullAddress} [${j}]`,
+							`Error writing cell: ${pError.message}`);
+					}
+				}
+
+				if (tmpArrayValues.length > tmpRangeSize)
 				{
 					pConversionReportService.logWarning(
 						pReport,
-						`${tmpTargetFieldRaw} -> ${tmpCellAddress}`,
-						`${tmpFullAddress} [${j}]`,
-						tmpElement.message);
-					continue;
+						tmpTargetFieldRaw,
+						tmpFullAddress,
+						`Source array has ${tmpArrayValues.length} elements but target range has ${tmpRangeSize} cells; truncated ${tmpArrayValues.length - tmpRangeSize} value(s).`);
 				}
-				try
+				else if (tmpArrayValues.length < tmpRangeSize)
 				{
-					this.writeCellValue(tmpWorksheet, tmpCellAddress, tmpElement.value);
-					pConversionReportService.logSuccess(
+					pConversionReportService.logWarning(
 						pReport,
-						`${tmpTargetFieldRaw} -> ${tmpCellAddress}`,
-						`${tmpFullAddress} [${j}]`,
-						tmpElement.value);
+						tmpTargetFieldRaw,
+						tmpFullAddress,
+						`Source array has ${tmpArrayValues.length} elements but target range has ${tmpRangeSize} cells; ${tmpRangeSize - tmpArrayValues.length} cell(s) left untouched.`);
 				}
-				catch (pError)
-				{
-					pConversionReportService.logError(
-						pReport,
-						`${tmpTargetFieldRaw} -> ${tmpCellAddress}`,
-						`${tmpFullAddress} [${j}]`,
-						`Error writing cell: ${pError.message}`);
-				}
-			}
-
-			if (tmpArrayValues.length > tmpRangeSize)
-			{
-				pConversionReportService.logWarning(
-					pReport,
-					tmpTargetFieldRaw,
-					tmpFullAddress,
-					`Source array has ${tmpArrayValues.length} elements but target range has ${tmpRangeSize} cells; truncated ${tmpArrayValues.length - tmpRangeSize} value(s).`);
-			}
-			else if (tmpArrayValues.length < tmpRangeSize)
-			{
-				pConversionReportService.logWarning(
-					pReport,
-					tmpTargetFieldRaw,
-					tmpFullAddress,
-					`Source array has ${tmpArrayValues.length} elements but target range has ${tmpRangeSize} cells; ${tmpRangeSize - tmpArrayValues.length} cell(s) left untouched.`);
 			}
 		}
 

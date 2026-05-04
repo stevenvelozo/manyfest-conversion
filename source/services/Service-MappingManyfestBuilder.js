@@ -6,17 +6,20 @@ const libPath = require('path');
 const libReadline = require('readline');
 
 /**
- * CSV column names (exact case) expected in the mappings CSV.
+ * Accepted CSV column names per logical column.  The first entry is the
+ * canonical/preferred name; subsequent entries are alternates carried over
+ * from earlier sample CSVs (the original Walbec-MDOT sample used snake_case
+ * and "HL Form" so we still accept those forms verbatim).
  */
-const CSV_COLUMN_SORT = 'Sort';
-const CSV_COLUMN_PDF_FILE = 'PDF File';
-const CSV_COLUMN_FIELD_TYPE = 'Field Type';
-const CSV_COLUMN_FIELD_NAME = 'Field Name';
-const CSV_COLUMN_FORM = 'Form';
-const CSV_COLUMN_DATA_LONG_FILLER = 'Document Data Long Filler';
-const CSV_COLUMN_INPUT_ADDRESS = 'Form Input Address';
-const CSV_COLUMN_INPUT_ADDRESS_LONG = 'Form Input Address Long';
-const CSV_COLUMN_NOTES = 'Notes';
+const CSV_COLUMNS_SORT = ['Sort'];
+const CSV_COLUMNS_PDF_FILE = ['PDF File', 'pdf_file'];
+const CSV_COLUMNS_FIELD_TYPE = ['Field Type', 'field_type'];
+const CSV_COLUMNS_FIELD_NAME = ['Field Name', 'field_name'];
+const CSV_COLUMNS_FORM = ['Form', 'HL Form'];
+const CSV_COLUMNS_DATA_LONG_FILLER = ['Document Data Long Filler'];
+const CSV_COLUMNS_INPUT_ADDRESS = ['Form Input Address'];
+const CSV_COLUMNS_INPUT_ADDRESS_LONG = ['Form Input Address Long'];
+const CSV_COLUMNS_NOTES = ['Notes'];
 
 /**
  * Default source root used when a mapping manyfest is applied to the
@@ -96,6 +99,79 @@ class MappingManyfestBuilder extends libFableServiceProviderBase
 	}
 
 	/**
+	 * Normalize a descriptor (old or new shape) to a flat array of target
+	 * specs.  This is the contract the fillers consume.
+	 *
+	 * Old shape (1:1, pre-Targets[]):
+	 *   { TargetFieldName, TargetFieldType, SourceSortOrder, Notes, ... }
+	 *
+	 * New shape (1:N):
+	 *   { Targets: [ { TargetFieldName, TargetFieldType, ... }, ... ] }
+	 *
+	 * Returns an array of { TargetFieldName, TargetFieldType, SourceSortOrder,
+	 * Notes } objects.  An empty array is returned for a descriptor with no
+	 * usable target metadata.
+	 *
+	 * @param {object} pDescriptor
+	 * @returns {Array<object>}
+	 */
+	normalizeDescriptorTargets(pDescriptor)
+	{
+		if (!pDescriptor || typeof(pDescriptor) !== 'object')
+		{
+			return [];
+		}
+		if (Array.isArray(pDescriptor.Targets) && pDescriptor.Targets.length > 0)
+		{
+			return pDescriptor.Targets;
+		}
+		if (pDescriptor.TargetFieldName)
+		{
+			return [
+				{
+					TargetFieldName: pDescriptor.TargetFieldName,
+					TargetFieldType: pDescriptor.TargetFieldType || 'Text',
+					SourceSortOrder: (typeof(pDescriptor.SourceSortOrder) === 'undefined') ? null : pDescriptor.SourceSortOrder,
+					Notes: pDescriptor.Notes || null
+				}
+			];
+		}
+		return [];
+	}
+
+	/**
+	 * Pick the first non-empty cell value from a parsed CSV row, given a
+	 * list of acceptable column names.  Used to support both the canonical
+	 * column headers (`PDF File`, `Field Type`, `Field Name`, `Form`) and
+	 * the legacy snake_case forms (`pdf_file`, `field_type`, `field_name`,
+	 * `HL Form`) emitted by older Walbec sample CSVs.
+	 *
+	 * @param {object} pRow - A header-keyed row as marshalled by CSVParser
+	 * @param {string[]} pColumnNames - Acceptable header names, in priority order
+	 * @returns {string} The first non-empty value, or `''` if none match.
+	 */
+	pickRowValue(pRow, pColumnNames)
+	{
+		if (!pRow || typeof(pRow) !== 'object' || !Array.isArray(pColumnNames))
+		{
+			return '';
+		}
+		for (let i = 0; i < pColumnNames.length; i++)
+		{
+			const tmpKey = pColumnNames[i];
+			if (Object.prototype.hasOwnProperty.call(pRow, tmpKey))
+			{
+				const tmpValue = pRow[tmpKey];
+				if (tmpValue !== null && typeof(tmpValue) !== 'undefined' && tmpValue !== '')
+				{
+					return String(tmpValue);
+				}
+			}
+		}
+		return '';
+	}
+
+	/**
 	 * Normalize a source address taken from the mapping CSV so that it
 	 * parses correctly through Manyfest.getValueAtAddress().
 	 *
@@ -151,16 +227,17 @@ class MappingManyfestBuilder extends libFableServiceProviderBase
 			return;
 		}
 
-		const tmpTargetFile = (pRow[CSV_COLUMN_PDF_FILE] || '').trim();
-		const tmpFieldName = (pRow[CSV_COLUMN_FIELD_NAME] || '').trim();
-		const tmpFieldType = (pRow[CSV_COLUMN_FIELD_TYPE] || 'Text').trim();
-		const tmpInputAddressRaw = (pRow[CSV_COLUMN_INPUT_ADDRESS] || '').trim();
+		const tmpTargetFile = this.pickRowValue(pRow, CSV_COLUMNS_PDF_FILE).trim();
+		const tmpFieldName = this.pickRowValue(pRow, CSV_COLUMNS_FIELD_NAME).trim();
+		const tmpFieldTypeRaw = this.pickRowValue(pRow, CSV_COLUMNS_FIELD_TYPE).trim();
+		const tmpFieldType = tmpFieldTypeRaw || 'Text';
+		const tmpInputAddressRaw = this.pickRowValue(pRow, CSV_COLUMNS_INPUT_ADDRESS).trim();
 		const tmpInputAddress = this.normalizeSourceAddress(tmpInputAddressRaw);
-		const tmpSourceDocType = (pRow[CSV_COLUMN_FORM] || '').trim();
-		const tmpLongFiller = (pRow[CSV_COLUMN_DATA_LONG_FILLER] || '').trim();
-		const tmpLongAddress = (pRow[CSV_COLUMN_INPUT_ADDRESS_LONG] || '').trim();
-		const tmpNotes = (pRow[CSV_COLUMN_NOTES] || '').trim();
-		const tmpSortRaw = pRow[CSV_COLUMN_SORT];
+		const tmpSourceDocType = this.pickRowValue(pRow, CSV_COLUMNS_FORM).trim();
+		const tmpLongFiller = this.pickRowValue(pRow, CSV_COLUMNS_DATA_LONG_FILLER).trim();
+		const tmpLongAddress = this.pickRowValue(pRow, CSV_COLUMNS_INPUT_ADDRESS_LONG).trim();
+		const tmpNotes = this.pickRowValue(pRow, CSV_COLUMNS_NOTES).trim();
+		const tmpSortRaw = this.pickRowValue(pRow, CSV_COLUMNS_SORT);
 
 		if (!tmpTargetFile)
 		{
@@ -218,38 +295,76 @@ class MappingManyfestBuilder extends libFableServiceProviderBase
 			return;
 		}
 
-		// If the same source address appears twice in the CSV, keep the first
-		// and record a warning.  We cannot have two descriptors at the same
-		// Manyfest address.
-		if (Object.prototype.hasOwnProperty.call(tmpConfig.Descriptors, tmpInputAddress))
+		// Build the per-target metadata for THIS row.  Multiple rows can
+		// pair the same source address with different target fields (e.g.
+		// the same value rendering at the top and bottom of a form), so a
+		// descriptor's "Targets" is an array.
+		const tmpTarget = (
+			{
+				TargetFieldName: tmpFieldName,
+				TargetFieldType: tmpFieldType || 'Text',
+				SourceSortOrder: (tmpSortRaw === '' || tmpSortRaw == null) ? null : Number(tmpSortRaw),
+				Notes: tmpNotes || null
+			});
+
+		const tmpExisting = tmpConfig.Descriptors[tmpInputAddress];
+		if (tmpExisting)
 		{
-			pBuildReport.RowsSkipped++;
-			pBuildReport.SkipReasons.push(
-				{
-					Row: pBuildReport.RowsParsed,
-					TargetFile: tmpTargetFile,
-					FieldName: tmpFieldName,
-					Reason: `Duplicate source address "${tmpInputAddress}" on form "${tmpTargetFile}"; keeping first occurrence`
-				});
+			// Existing descriptor at this source address.  Promote any
+			// legacy single-target shape (TargetFieldName/Type directly on
+			// the descriptor) into a Targets[] array, then append.
+			if (!Array.isArray(tmpExisting.Targets))
+			{
+				tmpExisting.Targets = [
+					{
+						TargetFieldName: tmpExisting.TargetFieldName,
+						TargetFieldType: tmpExisting.TargetFieldType || 'Text',
+						SourceSortOrder: (typeof(tmpExisting.SourceSortOrder) === 'undefined') ? null : tmpExisting.SourceSortOrder,
+						Notes: tmpExisting.Notes || null
+					}
+				];
+				delete tmpExisting.TargetFieldName;
+				delete tmpExisting.TargetFieldType;
+				delete tmpExisting.SourceSortOrder;
+				// Note: descriptor-level Notes (if any) is preserved on the
+				// promoted target above; clear it on the descriptor so the
+				// per-target Notes is the single source of truth.
+				delete tmpExisting.Notes;
+			}
+
+			// Refuse to add the SAME (source, target) pair twice -- that's
+			// a CSV authoring duplicate, not a real fan-out.
+			const tmpAlreadyHasTarget = tmpExisting.Targets.some((pT) => pT && pT.TargetFieldName === tmpTarget.TargetFieldName);
+			if (tmpAlreadyHasTarget)
+			{
+				pBuildReport.RowsSkipped++;
+				pBuildReport.SkipReasons.push(
+					{
+						Row: pBuildReport.RowsParsed,
+						TargetFile: tmpTargetFile,
+						FieldName: tmpFieldName,
+						Reason: `Duplicate (source, target) pair "${tmpInputAddress}" -> "${tmpFieldName}" on form "${tmpTargetFile}"; keeping first occurrence`
+					});
+				return;
+			}
+
+			tmpExisting.Targets.push(tmpTarget);
+			pBuildReport.RowsAccepted++;
+			pBuildReport.Forms[tmpTargetFile].DescriptorCount++;
 			return;
 		}
 
+		// First time we have seen this source address: create the descriptor
+		// in its native 1:N shape with a single target.
 		const tmpDescriptor = (
 			{
 				Name: `${tmpTargetFile}/${tmpFieldName}`,
 				Hash: this.hashForDescriptor(tmpTargetFile, tmpFieldName),
 				DataType: 'String',
-				TargetFieldName: tmpFieldName,
-				TargetFieldType: tmpFieldType || 'Text',
-				SourceSortOrder: (tmpSortRaw === '' || tmpSortRaw == null) ? null : Number(tmpSortRaw),
+				Targets: [tmpTarget],
 				SourceAddressRaw: tmpInputAddressRaw,
 				SourceAddressLong: tmpLongAddress || null
 			});
-
-		if (tmpNotes)
-		{
-			tmpDescriptor.Notes = tmpNotes;
-		}
 
 		tmpConfig.Descriptors[tmpInputAddress] = tmpDescriptor;
 		pBuildReport.RowsAccepted++;

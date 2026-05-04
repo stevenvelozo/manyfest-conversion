@@ -43,6 +43,63 @@ suite
 				libAssert.equal(tmpSvc.classifyTargetFileType('foo.txt'), 'Unknown');
 			});
 
+		test('pickRowValue tolerates legacy snake_case column names',
+			() =>
+			{
+				const tmpSvc = buildService();
+				// New canonical header keys
+				const tmpNewRow =
+					{
+						'PDF File': 'foo.pdf',
+						'Field Type': 'Text',
+						'Field Name': 'name',
+						'Form': 'MI-CAG-Walbec'
+					};
+				// Legacy header keys
+				const tmpLegacyRow =
+					{
+						'pdf_file': 'foo.pdf',
+						'field_type': 'Text',
+						'field_name': 'name',
+						'HL Form': 'MI-CAG-Walbec'
+					};
+				libAssert.equal(tmpSvc.pickRowValue(tmpNewRow, ['PDF File', 'pdf_file']), 'foo.pdf');
+				libAssert.equal(tmpSvc.pickRowValue(tmpLegacyRow, ['PDF File', 'pdf_file']), 'foo.pdf');
+				libAssert.equal(tmpSvc.pickRowValue(tmpLegacyRow, ['Form', 'HL Form']), 'MI-CAG-Walbec');
+				libAssert.equal(tmpSvc.pickRowValue(tmpLegacyRow, ['NotPresent']), '');
+				libAssert.equal(tmpSvc.pickRowValue(null, ['PDF File']), '');
+			});
+
+		test('applyRowToConfigs accepts legacy snake_case headers from a parsed row',
+			() =>
+			{
+				const tmpSvc = buildService();
+				const tmpConfigs = {};
+				const tmpReport = tmpSvc.newBuildReport();
+				const tmpLegacyRow =
+					{
+						'Sort': '1',
+						'pdf_file': 'foo.pdf',
+						'field_type': 'Text',
+						'field_name': 'po_number',
+						'HL Form': 'Bookstore-Acquisition',
+						'Document Data Long Filler': 'OrderData.',
+						'Form Input Address': 'Header.PONumber',
+						'Form Input Address Long': 'OrderData.Header.PONumber',
+						'Notes': ''
+					};
+				tmpSvc.applyRowToConfigs(tmpLegacyRow, tmpConfigs, tmpReport, {});
+				libAssert.equal(tmpReport.RowsAccepted, 1);
+				libAssert.equal(tmpReport.RowsSkipped, 0);
+				libAssert.equal(typeof tmpConfigs['foo.pdf'], 'object');
+				libAssert.equal(tmpConfigs['foo.pdf'].SourceDocumentType, 'Bookstore-Acquisition');
+				const tmpDescriptor = tmpConfigs['foo.pdf'].Descriptors['Header.PONumber'];
+				libAssert.equal(typeof tmpDescriptor, 'object');
+				libAssert.ok(Array.isArray(tmpDescriptor.Targets));
+				libAssert.equal(tmpDescriptor.Targets.length, 1);
+				libAssert.equal(tmpDescriptor.Targets[0].TargetFieldName, 'po_number');
+			});
+
 		test('buildFromCSVFileSync produces one config per target form',
 			function()
 			{
@@ -71,8 +128,9 @@ suite
 
 				const tmpDescriptor = tmp1859.Descriptors['CAGTable[0].CAGB'];
 				libAssert.equal(typeof tmpDescriptor, 'object');
-				libAssert.equal(tmpDescriptor.TargetFieldName, 'A4');
-				libAssert.equal(tmpDescriptor.TargetFieldType, 'Text');
+				libAssert.ok(Array.isArray(tmpDescriptor.Targets), 'descriptor should carry a Targets array');
+				libAssert.equal(tmpDescriptor.Targets[0].TargetFieldName, 'A4');
+				libAssert.equal(tmpDescriptor.Targets[0].TargetFieldType, 'Text');
 				libAssert.equal(tmpDescriptor.SourceAddressRaw, 'CAGTable[0]CAGB');
 
 				// XLSX entry tolerates the typo in the CSV filename (".xslx").

@@ -9,6 +9,8 @@ This document is the complete reference for the file format.
 
 ## Top-level shape
 
+A descriptor can carry one or more **targets**. Most descriptors map a single source value to a single PDF field or Excel cell, but it is also common for the same source value to appear at multiple places on a form (header + footer, a value plus its summary cell, etc.) -- the `Targets` array represents that 1:N relationship.
+
 ```json
 {
   "Scope": "Bookstore-Acquisition::AcquisitionOrder.pdf",
@@ -24,9 +26,21 @@ This document is the complete reference for the file format.
       "Name": "PO Number",
       "Hash": "AcquisitionOrder__po_number",
       "DataType": "String",
-      "TargetFieldName": "po_number",
-      "TargetFieldType": "Text",
-      "SourceSortOrder": 1,
+      "Targets":
+      [
+        {
+          "TargetFieldName": "po_number",
+          "TargetFieldType": "Text",
+          "SourceSortOrder": 1,
+          "Notes": null
+        },
+        {
+          "TargetFieldName": "header_po_no",
+          "TargetFieldType": "Text",
+          "SourceSortOrder": 47,
+          "Notes": null
+        }
+      ],
       "SourceAddressRaw": "Header.PONumber",
       "SourceAddressLong": "AppData.DocumentData.OrderData.Header.PONumber"
     }
@@ -69,14 +83,44 @@ Each entry under `Descriptors` is keyed by a **normalized source address** (rela
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `TargetFieldName` | string | The target field identifier: a PDF form field name (`po_number`, `Text1`), or an Excel cell reference (`E5`, `'Line Items'!B3-14`). **Required** for the fillers. |
-| `TargetFieldType` | string | `'Text'` or `'Button'`. PDF Button fields are warn-and-skip in v1. XLSX ignores this field. |
-| `SourceSortOrder` | number | Original `Sort` column value from the CSV. Preserved for reference and for reconstructing CSV order. |
+| `Targets` | array | One entry per target field this source value is written to. **Required** for the fillers (see "Targets array" below). |
 | `SourceAddressRaw` | string | The pre-normalization source address from the CSV (e.g. `CAGTable[0]CAGB`). Preserved for reference. |
 | `SourceAddressLong` | string | The "long form" source address from the CSV (e.g. `AppData.DocumentData.OrderData.Header.PONumber`). Preserved for reference. |
-| `Notes` | string | Free-form notes from the CSV's `Notes` column. Preserved for reference. |
 
 All custom keys are arbitrary JSON and are ignored by Manyfest itself -- only the fillers read them. You can add your own custom keys without breaking anything.
+
+### Targets array
+
+Each entry in `Targets[]` is a per-target spec:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `TargetFieldName` | string | The target field identifier: a PDF form field name (`po_number`, `Text1`), or an Excel cell reference (`E5`, `'Line Items'!B3-14`). **Required.** |
+| `TargetFieldType` | string | `'Text'` or `'Button'`. PDF Button fields are warn-and-skip in v1. XLSX ignores this field. |
+| `SourceSortOrder` | number \| null | Original `Sort` column value from the CSV row that produced this target. Preserved for reference and for reconstructing CSV order. |
+| `Notes` | string \| null | Free-form notes from the CSV's `Notes` column for this row. |
+
+When the builder sees two CSV rows with the same source address but different target fields, it appends a second entry to `Targets[]` rather than skipping the row. When the same `(source, target)` pair appears twice (an actual CSV authoring duplicate), the second occurrence is skipped with a clear `Duplicate (source, target) pair` reason in the build report.
+
+### Backward compatibility: legacy 1:1 descriptors
+
+Mapping manyfest files written before the `Targets[]` array existed put the per-target keys directly on the descriptor:
+
+```json
+"Header.PONumber":
+{
+    "Name": "PO Number",
+    "Hash": "AcquisitionOrder__po_number",
+    "DataType": "String",
+    "TargetFieldName": "po_number",
+    "TargetFieldType": "Text",
+    "SourceSortOrder": 1,
+    "SourceAddressRaw": "Header.PONumber",
+    "SourceAddressLong": "..."
+}
+```
+
+The fillers continue to read this shape transparently -- they treat any descriptor without a `Targets[]` array as a single-target descriptor synthesized from the directly-attached `TargetFieldName` / `TargetFieldType` / `SourceSortOrder` / `Notes` keys. **No rebuild is required for previously-shipped mapping JSONs.** When you do rebuild a mapping CSV with `mfconv build-mappings`, the new file is written in the `Targets[]` shape.
 
 ## Source root
 

@@ -4,22 +4,29 @@ The `TargetFieldName` on a mapping manyfest descriptor identifies the field in t
 
 ## PDF target field names
 
-PDF targets are **form field names** exactly as they appear in the fillable PDF's AcroForm definition. No special syntax: just the field name as a string.
+PDF targets are **form field names** exactly as they appear in the fillable PDF's AcroForm definition. No special syntax: just the field name as a string. Multiple target field names can share a single descriptor when they all draw from the same source address (header + footer, summary repeats, etc.) -- they're listed in the descriptor's `Targets` array.
 
 ```json
 {
   "Header.PONumber":
   {
-    "TargetFieldName": "po_number",
-    "TargetFieldType": "Text"
+    "Targets":
+    [
+      { "TargetFieldName": "po_number", "TargetFieldType": "Text" },
+      { "TargetFieldName": "header_po_no", "TargetFieldType": "Text" }
+    ]
   },
   "Header.VendorName":
   {
-    "TargetFieldName": "vendor_name",
-    "TargetFieldType": "Text"
+    "Targets":
+    [
+      { "TargetFieldName": "vendor_name", "TargetFieldType": "Text" }
+    ]
   }
 }
 ```
+
+> **Backward compatibility.** Legacy 1:1 mapping JSONs that put `TargetFieldName` directly on the descriptor (no `Targets[]` array) still fill correctly without rebuild. See [Mapping Manyfest Format](mapping-manyfest-format.md#backward-compatibility-legacy-11-descriptors) for details.
 
 To discover the field names in an existing PDF, use `pdftk` directly:
 
